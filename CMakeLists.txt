@@ -2,7 +2,8 @@ cmake_minimum_required (VERSION 2.8.11)
 project(Deformable)
 
 add_library(simulation-obj OBJECT 
-src/simulation/simulation.h src/simulation/simulation.cpp)
+src/simulation/integrator.h src/simulation/integrator.cpp
+src/simulation/minimizationMethod.h src/simulation/minimizationMethod.cpp)
 
 add_library(deformable 
 $<TARGET_OBJECTS:simulation-obj>)

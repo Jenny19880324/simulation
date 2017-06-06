@@ -1,4 +1,5 @@
-#include "simulation.h"
+#include "integrator.h"
+#include "minimizationMethod.h"
 
 int main(int argc, const char **argv) {
 	BackwardEuler integrator;
