@@ -1,74 +1,17 @@
-class MinimizationMethodInterface;
+class IntegratorInterface;
 
-class IntegratorInterface{
+
+class Simulation{
 public:
-	virtual ~IntegratorInterface(){}
-
-protected:
-	IntegratorInterface(){}
-};
-
-
-class ImplicitIntegratorInterface : public IntegratorInterface{
-public:
-	virtual ~ImplicitIntegratorInterface(){}
-	virtual void setMinimizationMethod(MinimizationMethodInterface *) = 0;
-
-protected:
-	ImplicitIntegratorInterface(){}
-};
-
-
-class BackwardEuler : public ImplicitIntegratorInterface{
-public:
-	BackwardEuler(){}
-	~BackwardEuler(){}
-
-	void setMinimizationMethod(MinimizationMethodInterface *) override;
-	void solveMinimization();
+	Simulation(){}
+	~Simulation(){}
+	
+	void update();
+	void setIntegrator(IntegratorInterface *);
 
 private:
-	friend class MinimizationMethodInterface;
-
+	friend class IntegratorInterface;
+	
 private:
-	MinimizationMethodInterface *mMinimizationMethod;
-
-};
-
-
-class MinimizationMethodInterface{
-public:
-	virtual ~MinimizationMethodInterface(){}
-	virtual void solveMinimization(ImplicitIntegratorInterface *) = 0;
-
-protected:
-	MinimizationMethodInterface(){}
-};
-
-
-class NewtonsMethod : public MinimizationMethodInterface{
-public:
-	NewtonsMethod(){}
-	~NewtonsMethod(){}
-	
-	static MinimizationMethodInterface *Instance();
-	
-	void solveMinimization(ImplicitIntegratorInterface *) override;
-
-private:
-	static MinimizationMethodInterface *mInstance;
-};
-
-
-class ProjectiveDynamics : public MinimizationMethodInterface{
-public:
-	ProjectiveDynamics(){}
-	~ProjectiveDynamics(){}
-	
-	static MinimizationMethodInterface *Instance();
-	
-	void solveMinimization(ImplicitIntegratorInterface *) override;
-
-private:
-	static MinimizationMethodInterface *mInstance;
+	IntegratorInterface *mIntegrator;
 };

@@ -22,7 +22,7 @@ public:
 	void solveMinimization(ImplicitIntegratorInterface *) override;
 
 private:
-	static MinimizationMethodInterface *mInstance;
+	static MinimizationMethodInterface *instance__;
 };
 
 
@@ -36,5 +36,5 @@ public:
 	void solveMinimization(ImplicitIntegratorInterface *) override;
 
 private:
-	static MinimizationMethodInterface *mInstance;
+	static MinimizationMethodInterface *instance__;
 };

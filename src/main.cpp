@@ -1,9 +1,15 @@
 #include "integrator.h"
 #include "minimizationMethod.h"
+#include "simulation.h"
 
 int main(int argc, const char **argv) {
-	BackwardEuler integrator;
-	integrator.setMinimizationMethod(ProjectiveDynamics::Instance());
+	Simulation sim;
+	sim.setIntegrator(BackwardEuler::Instance());
+
+	BackwardEuler::Instance()->setMinimizationMethod(NewtonsMethod::Instance());
 	
-	integrator.solveMinimization();
+
+	
+	sim.update();
+
 }

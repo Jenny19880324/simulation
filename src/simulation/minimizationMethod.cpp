@@ -1,13 +1,13 @@
 #include <iostream>
 #include "minimizationMethod.h"
 
-MinimizationMethodInterface *NewtonsMethod::mInstance = 0;
+MinimizationMethodInterface *NewtonsMethod::instance__ = 0;
 
 MinimizationMethodInterface *NewtonsMethod::Instance() {
-	if (mInstance == 0) {
-		mInstance = new NewtonsMethod();
+	if (instance__ == 0) {
+		instance__ = new NewtonsMethod();
 	}
-	return mInstance;
+	return instance__;
 }
 
 void NewtonsMethod::solveMinimization(ImplicitIntegratorInterface *integrator){
@@ -16,13 +16,13 @@ void NewtonsMethod::solveMinimization(ImplicitIntegratorInterface *integrator){
 
 
 
-MinimizationMethodInterface *ProjectiveDynamics::mInstance = 0;
+MinimizationMethodInterface *ProjectiveDynamics::instance__ = 0;
 
 MinimizationMethodInterface *ProjectiveDynamics::Instance() {
-	if (mInstance == 0) {
-		mInstance = new ProjectiveDynamics();
+	if (instance__ == 0) {
+		instance__ = new ProjectiveDynamics();
 	}
-	return mInstance;
+	return instance__;
 }
 
 void ProjectiveDynamics::solveMinimization(ImplicitIntegratorInterface *integrator){
