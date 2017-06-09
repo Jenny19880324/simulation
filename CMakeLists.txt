@@ -5,7 +5,7 @@ add_library(simulation-obj OBJECT
 src/simulation/simulation.h src/simulation/simulation.cpp
 src/simulation/integrator.h src/simulation/integrator.cpp
 src/simulation/minimizationMethod.h src/simulation/minimizationMethod.cpp
-src/simulation/rayleighDamping.h src/simulation/rayleighDamping.cpp)
+src/simulation/minimizationExpression.h src/simulation/minimizationExpression.cpp)
 
 add_library(deformable 
 $<TARGET_OBJECTS:simulation-obj>)

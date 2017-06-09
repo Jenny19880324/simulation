@@ -1,5 +1,5 @@
 #include <iostream>
-#include "rayleighDamping.h"
+#include "minimizationExpression.h"
 
 MinimizationExpressionInterface *RayleighDamping::instance__ = 0;
 

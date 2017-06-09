@@ -1,6 +1,6 @@
 #include <iostream>
 #include "minimizationMethod.h"
-#include "rayleighDamping.h"
+#include "minimizationExpression.h"
 
 MinimizationMethodInterface *NewtonsMethod::instance__ = 0;
 

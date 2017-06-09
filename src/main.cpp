@@ -1,15 +1,15 @@
 #include "integrator.h"
 #include "minimizationMethod.h"
 #include "simulation.h"
-#include "rayleighDamping.h"
+#include "minimizationExpression.h"
 
 int main(int argc, const char **argv) {
 	Simulation sim;
 	sim.setIntegrator(BackwardEuler::Instance());
 
-	BackwardEuler::Instance()->setMinimizationMethod(NewtonsMethod::Instance());
+	BackwardEuler::Instance()->setMinimizationMethod(ProjectiveDynamics::Instance());
 
-	NewtonsMethod::Instance()->setMinimizationExpression(RayleighDamping::Instance());
+	ProjectiveDynamics::Instance()->setMinimizationExpression(RayleighDamping::Instance());
 	
 
 	
