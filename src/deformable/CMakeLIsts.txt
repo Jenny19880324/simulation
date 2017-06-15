@@ -1,0 +1,19 @@
+###############################################################################
+#deformable library
+###############################################################################
+
+add_definitions(-D_EXPORTING)
+
+#the simulation object library
+
+add_library(simulation-obj OBJECT 
+simulation.h simulation.cpp
+integrator.h integrator.cpp
+minimizationMethod.h minimizationMethod.cpp
+minimizationExpression.h minimizationExpression.cpp)
+
+
+#the deformable library
+
+add_library(deformable SHARED
+$<TARGET_OBJECTS:simulation-obj>)

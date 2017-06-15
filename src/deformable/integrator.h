@@ -1,8 +1,15 @@
+#ifdef _EXPORTING
+#define CLASS_DECLSPEC __declspec(dllexport)
+#else
+#define CLASS_DECLSPEC __declspec(dllimport)
+#endif
+
+
 //forward declaration
 class MinimizationMethodInterface;
 class Simulation;
 
-class IntegratorInterface{
+class CLASS_DECLSPEC IntegratorInterface{
 public:
 	virtual ~IntegratorInterface(){}
 	virtual void update(Simulation *) = 0;
@@ -12,7 +19,7 @@ protected:
 };
 
 
-class ExplicitIntegratorInterface : public IntegratorInterface {
+class CLASS_DECLSPEC ExplicitIntegratorInterface : public IntegratorInterface {
 public:
 	virtual ~ExplicitIntegratorInterface(){}
 
@@ -21,7 +28,7 @@ protected:
 };
 
 
-class ForwardEuler : public ExplicitIntegratorInterface {
+class CLASS_DECLSPEC ForwardEuler : public ExplicitIntegratorInterface {
 public:
 	static ExplicitIntegratorInterface *Instance();
 	void update(Simulation *) override;
@@ -31,7 +38,7 @@ private:
 };
 
 
-class ExplicitMidpoint : public ExplicitIntegratorInterface {
+class CLASS_DECLSPEC ExplicitMidpoint : public ExplicitIntegratorInterface {
 public:
 	static ExplicitIntegratorInterface *Instance();
 	void update(Simulation *) override;
@@ -41,7 +48,7 @@ private:
 };
 
 
-class ExplicitSymplectic : public ExplicitIntegratorInterface {
+class CLASS_DECLSPEC ExplicitSymplectic : public ExplicitIntegratorInterface {
 public:
 	static ExplicitIntegratorInterface *Instance();
 	void update(Simulation *) override;
@@ -51,7 +58,7 @@ private:
 };
 
 
-class RungeKutta4 : public ExplicitIntegratorInterface {
+class CLASS_DECLSPEC RungeKutta4 : public ExplicitIntegratorInterface {
 public:
 	static ExplicitIntegratorInterface *Instance();
 	void update(Simulation *) override;
@@ -61,7 +68,7 @@ private:
 };
 
 
-class AdaptiveRungeKutta : public ExplicitIntegratorInterface {
+class CLASS_DECLSPEC AdaptiveRungeKutta : public ExplicitIntegratorInterface {
 public:
 	static ExplicitIntegratorInterface *Instance();
 	void update(Simulation *) override;
@@ -77,7 +84,7 @@ private:
 
 
 
-class ImplicitIntegratorInterface : public IntegratorInterface{
+class CLASS_DECLSPEC ImplicitIntegratorInterface : public IntegratorInterface{
 public:
 	virtual ~ImplicitIntegratorInterface(){}
 	virtual void setMinimizationMethod(MinimizationMethodInterface *) = 0;
@@ -89,7 +96,7 @@ protected:
 
 
 
-class QuasiStatic : public ImplicitIntegratorInterface {
+class CLASS_DECLSPEC QuasiStatic : public ImplicitIntegratorInterface {
 public:
 	static ImplicitIntegratorInterface *Instance();
 
@@ -106,7 +113,7 @@ private:
 };
 
 
-class BackwardEuler : public ImplicitIntegratorInterface{
+class CLASS_DECLSPEC BackwardEuler : public ImplicitIntegratorInterface{
 public:
 	static ImplicitIntegratorInterface *Instance();
 	
@@ -127,7 +134,7 @@ private:
 };
 
 
-class BDF2 : public ImplicitIntegratorInterface {
+class CLASS_DECLSPEC BDF2 : public ImplicitIntegratorInterface {
 public:
 	static ImplicitIntegratorInterface *Instance();
 

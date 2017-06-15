@@ -1,9 +1,15 @@
+#ifdef _EXPORTING
+#define CLASS_DECLSPEC __declspec(dllexport)
+#else
+#define CLASS_DECLSPEC __declspec(dllimport)
+#endif
+
 //forward declaration
 class ImplicitIntegratorInterface;
 class MinimizationExpressionInterface;
 
 
-class MinimizationMethodInterface{
+class CLASS_DECLSPEC MinimizationMethodInterface{
 public:
 	virtual ~MinimizationMethodInterface(){}
 	virtual void solveMinimization(ImplicitIntegratorInterface *) = 0;
@@ -17,7 +23,7 @@ protected:
 };
 
 
-class NewtonsMethod : public MinimizationMethodInterface{
+class CLASS_DECLSPEC NewtonsMethod : public MinimizationMethodInterface{
 public:
 	NewtonsMethod();
 	~NewtonsMethod();
@@ -42,7 +48,7 @@ private:
 };
 
 
-class ProjectiveDynamics : public MinimizationMethodInterface{
+class CLASS_DECLSPEC ProjectiveDynamics : public MinimizationMethodInterface{
 public:
 	ProjectiveDynamics();
 	~ProjectiveDynamics();

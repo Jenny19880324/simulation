@@ -1,4 +1,10 @@
-class MinimizationExpressionInterface {
+#ifdef _EXPORTING
+#define CLASS_DECLSPEC __declspec(dllexport)
+#else
+#define CLASS_DECLSPEC __declspec(dllimport)
+#endif
+
+class CLASS_DECLSPEC MinimizationExpressionInterface {
 public:
 	virtual ~MinimizationExpressionInterface() {}
 	virtual double evaluateEnergy() = 0;
@@ -13,7 +19,7 @@ protected:
 };
 
 
-class RayleighDamping : public MinimizationExpressionInterface {
+class CLASS_DECLSPEC RayleighDamping : public MinimizationExpressionInterface {
 public:
 	static MinimizationExpressionInterface *Instance();
 
@@ -32,7 +38,7 @@ private:
 };
 
 
-class NoDamping : public MinimizationExpressionInterface {
+class CLASS_DECLSPEC NoDamping : public MinimizationExpressionInterface {
 public:
 	static MinimizationExpressionInterface *Instance();
 

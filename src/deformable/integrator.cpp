@@ -29,6 +29,19 @@ void ExplicitSymplectic::update(Simulation *sim) {
 
 }
 
+ExplicitIntegratorInterface *ExplicitMidpoint::instance__ = 0;
+
+ExplicitIntegratorInterface *ExplicitMidpoint::Instance() {
+	if (instance__ == 0) {
+		instance__ = new ExplicitMidpoint();
+	}
+	return instance__;
+}
+
+void ExplicitMidpoint::update(Simulation *sim) {
+
+}
+
 ExplicitIntegratorInterface *RungeKutta4::instance__ = 0;
 
 ExplicitIntegratorInterface *RungeKutta4::Instance() {
