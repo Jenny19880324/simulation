@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8.11)
-project(Deformable)
+project(application)
 
 ###############################################################################
 #external library
@@ -13,11 +13,24 @@ set(NANOGUI_EXTRA_LIBS "")
 list(APPEND NANOGUI_EXTRA_LIBS opengl32)
 
 ###############################################################################
+#include directory
+###############################################################################
+
+# set the MAIN_INCLUDE_DIRECTORIES before add_subdirectory so that the 
+# CHILD SCOPE can see it as well
+
+set(MAIN_INCLUDE_DIRECTORIES "")
+list(APPEND MAIN_INCLUDE_DIRECTORIES 
+"${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+
+###############################################################################
 #deformable library
 ###############################################################################
 set(DEFORMABLE_SRC_DIR src/deformable)
 set(DEFORMABLE_BIN_DIR deformable)
 add_subdirectory(${DEFORMABLE_SRC_DIR} ${DEFORMABLE_BIN_DIR})
+
 
 ###############################################################################
 #the application
@@ -26,10 +39,7 @@ add_executable(main src/main.cpp)
 target_link_libraries(main debug deformable debug ${DEBUG_NANOGUI_LIB} ${NANOGUI_EXTRA_LIBS})
 target_link_libraries(main optimized deformable optimized ${RELEASE_NANOGUI_LIB} ${NANOGUI_EXTRA_LIBS})
 
-set(MAIN_INCLUDE_DIRECTORIES "")
-list(APPEND MAIN_INCLUDE_DIRECTORIES 
-src/deformable)
-target_include_directories(main PUBLIC ${MAIN_INCLUDE_DIRECTORIES})
+target_include_directories(main PUBLIC "${MAIN_INCLUDE_DIRECTORIES}")
 
 
 ###############################################################################

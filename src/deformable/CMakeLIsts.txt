@@ -7,13 +7,17 @@ add_definitions(-D_EXPORTING)
 #the simulation object library
 
 add_library(simulation-obj OBJECT 
-simulation.h simulation.cpp
-integrator.h integrator.cpp
-minimizationMethod.h minimizationMethod.cpp
-minimizationExpression.h minimizationExpression.cpp)
+simulation.cpp
+integrator.cpp
+minimizationMethod.cpp
+minimizationExpression.cpp)
+
+target_include_directories(simulation-obj PUBLIC "${MAIN_INCLUDE_DIRECTORIES}")
+message("deformable scope MAIN_INCLUDE_DIRECTORIES is ${MAIN_INCLUDE_DIRECTORIES}")
 
 
 #the deformable library
 
 add_library(deformable SHARED
 $<TARGET_OBJECTS:simulation-obj>)
+
