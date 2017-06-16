@@ -1,5 +1,6 @@
 #include <iostream>
 #include "minimizationExpression.h"
+#include "lineSearch.h"
 
 MinimizationExpressionInterface *RayleighDamping::instance__ = 0;
 
@@ -36,7 +37,12 @@ void RayleighDamping::evaluateHessian() {
 double RayleighDamping::lineSearch() {
 	evaluateEnergy();
 	std::cout << "RayleighDamping lineSearch" << std::endl;
+	mLineSearch->lineSearch();
 	return 0;
+}
+
+void RayleighDamping::setLineSearch(LineSearchInterface *lineSearch) {
+	mLineSearch = lineSearch;
 }
 
 
@@ -77,6 +83,12 @@ void NoDamping::evaluateHessian() {
 
 double NoDamping::lineSearch() {
 	std::cout << "NoDamping lineSearch" << std::endl;
+	mLineSearch->lineSearch();
 	evaluateEnergy();
 	return 0;
+}
+
+
+void NoDamping::setLineSearch(LineSearchInterface *lineSearch) {
+	mLineSearch = lineSearch;
 }

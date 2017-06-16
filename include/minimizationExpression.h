@@ -4,6 +4,10 @@
 #define CLASS_DECLSPEC __declspec(dllimport)
 #endif
 
+
+class LineSearchInterface;
+
+
 class CLASS_DECLSPEC MinimizationExpressionInterface {
 public:
 	virtual ~MinimizationExpressionInterface() {}
@@ -12,6 +16,7 @@ public:
 	virtual void evaluateLaplacian() = 0;
 	virtual void evaluateHessian() = 0;
 	virtual double lineSearch() = 0;
+	virtual void setLineSearch(LineSearchInterface *) = 0;
 
 protected:
 	MinimizationExpressionInterface() {}
@@ -28,13 +33,15 @@ public:
 	virtual void evaluateLaplacian() override;
 	virtual void evaluateHessian() override;
 	virtual double lineSearch() override;
+	virtual void setLineSearch(LineSearchInterface *) override;
 
 protected:
 	RayleighDamping() {}
 
 private:
-	
 	static MinimizationExpressionInterface *instance__;
+	
+	LineSearchInterface *mLineSearch;
 };
 
 
@@ -47,12 +54,15 @@ public:
 	virtual void evaluateLaplacian() override;
 	virtual void evaluateHessian() override;
 	virtual double lineSearch() override;
+	virtual void setLineSearch(LineSearchInterface *) override;
 
 protected:
 	NoDamping(){}
 
 private:
 	static MinimizationExpressionInterface *instance__;
+	
+	LineSearchInterface *mLineSearch;
 
 
 };

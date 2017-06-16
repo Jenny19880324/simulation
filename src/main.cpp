@@ -2,6 +2,7 @@
 #include "minimizationMethod.h"
 #include "simulation.h"
 #include "minimizationExpression.h"
+#include "lineSearch.h"
 
 int main(int argc, const char **argv) {
 	Simulation sim;
@@ -10,6 +11,8 @@ int main(int argc, const char **argv) {
 	BackwardEuler::Instance()->setMinimizationMethod(ProjectiveDynamics::Instance());
 
 	ProjectiveDynamics::Instance()->setMinimizationExpression(RayleighDamping::Instance());
+
+	RayleighDamping::Instance()->setLineSearch(NoLineSearch::Instance());
 	
 
 	

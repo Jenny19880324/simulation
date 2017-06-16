@@ -10,7 +10,8 @@ add_library(simulation-obj OBJECT
 simulation.cpp
 integrator.cpp
 minimizationMethod.cpp
-minimizationExpression.cpp)
+minimizationExpression.cpp
+lineSearch.cpp)
 
 target_include_directories(simulation-obj PUBLIC "${MAIN_INCLUDE_DIRECTORIES}")
 message("deformable scope MAIN_INCLUDE_DIRECTORIES is ${MAIN_INCLUDE_DIRECTORIES}")
