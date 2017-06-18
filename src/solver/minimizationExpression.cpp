@@ -17,6 +17,9 @@ MinimizationExpressionInterface *RayleighDamping::Instance(const Solver *solver)
 
 
 RayleighDamping::RayleighDamping(const Solver *solver) : mSolver(solver) {
+	unsigned systemDimension = mSolver->getSystemDimension();
+	mDampingMatrix.resize(systemDimension, systemDimension);
+
 	NoDamping::Instance(mSolver)->evaluateLaplacian(mDampingMatrix);
 
 	std::cout << "mDampingMatrix" << std::endl << mDampingMatrix << std::endl;

@@ -27,10 +27,10 @@ protected:
 
 class CLASS_DECLSPEC NewtonsMethod : public MinimizationMethodInterface{
 public:
-	NewtonsMethod();
+	NewtonsMethod(const Solver *);
 	~NewtonsMethod();
 	
-	static MinimizationMethodInterface *Instance();
+	static MinimizationMethodInterface *Instance(const Solver *);
 	
 
 	void solveMinimization(ImplicitIntegratorInterface *) override;
@@ -43,7 +43,7 @@ private:
 
 	MinimizationExpressionInterface *mMinimizationExpression;
 
-	Solver *mSolver;
+	const Solver *mSolver;
 
 	Eigen::SimplicialLLT<SpMat, Eigen::Upper> mSparseLinearSystemSolver;
 
@@ -52,10 +52,10 @@ private:
 
 class CLASS_DECLSPEC ProjectiveDynamics : public MinimizationMethodInterface{
 public:
-	ProjectiveDynamics();
+	ProjectiveDynamics(const Solver *);
 	~ProjectiveDynamics();
 	
-	static MinimizationMethodInterface *Instance();
+	static MinimizationMethodInterface *Instance(const Solver *);
 	
 	void solveMinimization(ImplicitIntegratorInterface *) override;
 	void setMinimizationExpression(MinimizationExpressionInterface *minimizationExpression) override;
@@ -67,6 +67,6 @@ private:
 
 	MinimizationExpressionInterface *mMinimizationExpression;
 
-	Solver *mSolver;
+	const Solver *mSolver;
 
 };

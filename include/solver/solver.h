@@ -26,14 +26,17 @@ public:
 
 
 	const IntegratorInterface *getIntegrator() const { return mIntegrator; }
-	double getH() const { return mH;}
 	const VectorX &getCurrentPositions() const { return mCurrentPositions; }
 	const VectorX &getCurrentVelocities() const { return mCurrentVelocities; }
 	const SpMat &getMassMatrix() const { return mMassMatrix; }
 	const std::vector<ConstraintInterface *> &getConstraints() const { return mConstraints; }
+	unsigned getSystemDimension() const { return mSystemDimension; }
+	double getH() const { return mH; }
 	
 private:
 	IntegratorInterface *mIntegrator;
+
+	unsigned mSystemDimension;
 
 	double mH;
 

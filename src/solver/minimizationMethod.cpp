@@ -9,7 +9,7 @@
 MinimizationMethodInterface *NewtonsMethod::instance__ = 0;
 
 
-NewtonsMethod::NewtonsMethod() {
+NewtonsMethod::NewtonsMethod(const Solver *solver) : mSolver(solver) {
 }
 
 
@@ -18,9 +18,9 @@ NewtonsMethod::~NewtonsMethod() {
 }
 
 
-MinimizationMethodInterface *NewtonsMethod::Instance() {
+MinimizationMethodInterface *NewtonsMethod::Instance(const Solver *solver) {
 	if (instance__ == 0) {
-		instance__ = new NewtonsMethod();
+		instance__ = new NewtonsMethod(solver);
 	}
 	return instance__;
 }
@@ -32,7 +32,11 @@ void NewtonsMethod::solveMinimization(ImplicitIntegratorInterface *integrator){
 	SpMat hessian;
 	VectorX descentDir;
 
-	VectorX x = mSolver->getCurrentPositions() + mSolver->getCurrentVelocities() * mSolver->getH();
+	const VectorX &currentPositions = mSolver->getCurrentPositions();
+	const VectorX &currentVelocities = mSolver->getCurrentVelocities();
+	double h = mSolver->getH();
+
+	VectorX x = currentPositions + currentVelocities * h;
 
 	while (-descentDir.dot(gradient) > EXIT_CONDITION) {
 		integrator->evaluateGradient(x, gradient);
@@ -45,14 +49,6 @@ void NewtonsMethod::solveMinimization(ImplicitIntegratorInterface *integrator){
 
 	}
 	
-
-
-	/*
-	while (exit condition is not satisfied) {
-		solve the linear matrix
-		lineSearch
-	}
-	*/
 }
 
 void NewtonsMethod::setMinimizationExpression(MinimizationExpressionInterface *minimizationExpression) {
@@ -64,9 +60,9 @@ void NewtonsMethod::setMinimizationExpression(MinimizationExpressionInterface *m
 
 MinimizationMethodInterface *ProjectiveDynamics::instance__ = 0;
 
-MinimizationMethodInterface *ProjectiveDynamics::Instance() {
+MinimizationMethodInterface *ProjectiveDynamics::Instance(const Solver *solver) {
 	if (instance__ == 0) {
-		instance__ = new ProjectiveDynamics();
+		instance__ = new ProjectiveDynamics(solver);
 	}
 	return instance__;
 }
@@ -78,7 +74,7 @@ void ProjectiveDynamics::solveMinimization(ImplicitIntegratorInterface *integrat
 }
 
 
-ProjectiveDynamics::ProjectiveDynamics() {
+ProjectiveDynamics::ProjectiveDynamics(const Solver *solver) : mSolver(solver) {
 }
 
 ProjectiveDynamics::~ProjectiveDynamics() {

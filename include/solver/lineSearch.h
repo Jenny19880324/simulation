@@ -8,7 +8,7 @@
 #include "typedef.h"
 
 class ImplicitIntegratorInterface;
-
+class Solver;
 
 class CLASS_DECLSPEC LineSearchInterface {
 public:
@@ -22,17 +22,17 @@ protected:
 
 class CLASS_DECLSPEC BacktrackingLineSearch : public LineSearchInterface {
 public:
-	static LineSearchInterface *Instance(const ImplicitIntegratorInterface *);
+	static LineSearchInterface *Instance(const Solver *);
 
 	virtual double lineSearch(const VectorX &x, const VectorX &gradient, const VectorX &descentDir) const override;
 
 protected:
-	BacktrackingLineSearch(const ImplicitIntegratorInterface *);
+	BacktrackingLineSearch(const Solver *);
 
 private:
 	static LineSearchInterface *instance__;
 
-	const ImplicitIntegratorInterface *mIntegrator;
+	const Solver *mSolver;
 
 	double mRho;  //to determine how much the energy should decrease
 	double mC;    //to scale down step size
@@ -41,15 +41,15 @@ private:
 
 class CLASS_DECLSPEC NoLineSearch : public LineSearchInterface {
 public:
-	static LineSearchInterface *Instance(const ImplicitIntegratorInterface *);
+	static LineSearchInterface *Instance(const Solver *);
 
 	virtual  double lineSearch(const VectorX &x, const VectorX &gradient, const VectorX &descentDir) const override;
 
 protected:
-	NoLineSearch(const ImplicitIntegratorInterface *);
+	NoLineSearch(const Solver *);
 
 private:
 	static LineSearchInterface *instance__;
 
-	const ImplicitIntegratorInterface *mIntegrator;
+	const Solver *mSolver;
 };

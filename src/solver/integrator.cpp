@@ -229,6 +229,7 @@ void ImplicitMidpoint::evaluateGradient(const VectorX &x, VectorX &gradient) con
 	gradient = massMatrix * (x - y) +  h * h / 2 * gradient;
 }
 
+
 void ImplicitMidpoint::evaluateHessian(const VectorX &x, SpMat &hessian) const {
 	const VectorX &currentPositions = mSolver->getCurrentPositions();
 	const SpMat &massMatrix = mSolver->getMassMatrix();
@@ -238,6 +239,7 @@ void ImplicitMidpoint::evaluateHessian(const VectorX &x, SpMat &hessian) const {
 	hessian = massMatrix + h * h / 4 * hessian;
 }
 
+
 void ImplicitMidpoint::evaluateLaplacian(SpMat &laplacian) const {
 	const SpMat &massMatrix = mSolver->getMassMatrix();
 	double h = mSolver->getH();
@@ -245,6 +247,7 @@ void ImplicitMidpoint::evaluateLaplacian(SpMat &laplacian) const {
 	mMinimizationExpression->evaluateLaplacian(laplacian);
 	laplacian = massMatrix + h * h / 4 * laplacian;
 }
+
 
 void ImplicitMidpoint::evaluateAppendedExpressionGradient(const SpMat &mDampingMatrix, const VectorX &x, VectorX &gradient) const {
 	double h = mSolver->getH();
@@ -255,6 +258,7 @@ void ImplicitMidpoint::evaluateAppendedExpressionGradient(const SpMat &mDampingM
 
 	gradient = 2 * h * mDampingMatrix * v;
 }
+
 
 void ImplicitMidpoint::evaluateAppendedExpressionHessian(const SpMat &mDampingMatrix, SpMat &hessian) const {
 	hessian = 4 * mDampingMatrix;
