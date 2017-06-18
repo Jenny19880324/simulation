@@ -1,13 +1,15 @@
 #include "solver.h"
 #include "integrator.h"
 
+
+Solver::Solver(const VectorX &initialPositions, const VectorX &initialVelocities, const SpMat &massMatrix, const std::vector<ConstraintInterface *> &constraints):
+mCurrentPositions(initialPositions), mCurrentVelocities(initialVelocities), mMassMatrix(massMatrix), mConstraints(constraints){}
+
+
 void Solver::update() {
 	mIntegrator->update(this);
 }
 
-void Solver::setIntegrator(IntegratorInterface *integrator){
-	mIntegrator = integrator;
-}
 
 
 

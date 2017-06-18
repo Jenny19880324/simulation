@@ -13,11 +13,18 @@ class ConstraintInterface;
 
 class CLASS_DECLSPEC Solver{
 public:
-	Solver(){}
+	Solver(const VectorX &initialPositions, const VectorX &initialVelocities, const SpMat &massMatrix, const std::vector<ConstraintInterface *> &constraints);
 	~Solver(){}
 	
 	void update();
-	void setIntegrator(IntegratorInterface *);
+	void setIntegrator(IntegratorInterface *integrator) { mIntegrator = integrator; }
+	void setH(double h) { mH = h; }
+	void setCurrentPositions(const VectorX &currentPositions) { mCurrentPositions = currentPositions; }
+	void setCurrentVelocities(const VectorX &currentVelocities) { mCurrentVelocities = currentVelocities; }
+	void setY(const VectorX &y) { mY = y; }
+	void setMassMatrix(const SpMat &massMatrix) { mMassMatrix = massMatrix; }
+	void setConstraints(const std::vector<ConstraintInterface *> &constraints) { mConstraints = constraints; }
+
 
 	const IntegratorInterface *getIntegrator() const { return mIntegrator; }
 	double getH() const { return mH;}
