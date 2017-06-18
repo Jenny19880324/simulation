@@ -13,7 +13,7 @@ class ConstraintInterface;
 
 class CLASS_DECLSPEC Solver{
 public:
-	Solver(const VectorX &initialPositions, const VectorX &initialVelocities, const SpMat &massMatrix, const std::vector<ConstraintInterface *> &constraints);
+	Solver(const VectorX &initialPositions, const VectorX &initialVelocities, const SpMat &massMatrix, const std::vector<ConstraintInterface *> &constraints, double h = 0.033);
 	~Solver(){}
 	
 	void update();
@@ -21,7 +21,6 @@ public:
 	void setH(double h) { mH = h; }
 	void setCurrentPositions(const VectorX &currentPositions) { mCurrentPositions = currentPositions; }
 	void setCurrentVelocities(const VectorX &currentVelocities) { mCurrentVelocities = currentVelocities; }
-	void setY(const VectorX &y) { mY = y; }
 	void setMassMatrix(const SpMat &massMatrix) { mMassMatrix = massMatrix; }
 	void setConstraints(const std::vector<ConstraintInterface *> &constraints) { mConstraints = constraints; }
 
@@ -30,7 +29,6 @@ public:
 	double getH() const { return mH;}
 	const VectorX &getCurrentPositions() const { return mCurrentPositions; }
 	const VectorX &getCurrentVelocities() const { return mCurrentVelocities; }
-	const VectorX &getY() const { return mY; }
 	const SpMat &getMassMatrix() const { return mMassMatrix; }
 	const std::vector<ConstraintInterface *> &getConstraints() const { return mConstraints; }
 	
@@ -42,8 +40,6 @@ private:
 	VectorX mCurrentPositions;
 
 	VectorX mCurrentVelocities;
-
-	VectorX mY;
 
 	SpMat mMassMatrix;
 

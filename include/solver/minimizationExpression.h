@@ -9,7 +9,7 @@
 
 
 class LineSearchInterface;
-class IntergratorInterface;
+class ImplicitIntergratorInterface;
 class Solver;
 
 
@@ -18,7 +18,7 @@ public:
 	virtual ~MinimizationExpressionInterface() {}
 	virtual double evaluateEnergy(const VectorX &) const = 0;
 	virtual void evaluateGradient(const VectorX &, VectorX &) const = 0;
-	virtual void evaluateLaplacian(const VectorX &, SpMat &) const = 0;
+	virtual void evaluateLaplacian(SpMat &) const = 0;
 	virtual void evaluateHessian(const VectorX &, SpMat &) const = 0;
 	virtual double lineSearch(const VectorX &, const VectorX &, const VectorX &) const = 0;
 
@@ -36,7 +36,7 @@ public:
 
 	double evaluateEnergy(const VectorX &) const override;
 	void evaluateGradient(const VectorX &, VectorX &) const override;
-	void evaluateLaplacian(const VectorX &, SpMat &) const override;
+	void evaluateLaplacian(SpMat &) const override;
 	void evaluateHessian(const VectorX &, SpMat &) const override;
 	double lineSearch(const VectorX &, const VectorX &, const VectorX &) const override;
 
@@ -63,7 +63,7 @@ public:
 
 	double evaluateEnergy(const VectorX &) const override;
 	void evaluateGradient(const VectorX &, VectorX &) const override;
-	void evaluateLaplacian(const VectorX &, SpMat &) const override;
+	void evaluateLaplacian(SpMat &) const override;
 	void evaluateHessian(const VectorX &, SpMat &) const override;
 	double lineSearch(const VectorX &, const VectorX &, const VectorX &) const override;
 

@@ -51,7 +51,7 @@ void SpringConstraint::evaluateHessian(const VectorX &x, std::vector<T> &triplet
 
 }
 
-void SpringConstraint::evaluateLaplacian(const VectorX &x, std::vector<T> &triplets) const {
+void SpringConstraint::evaluateLaplacian(std::vector<T> &triplets) const {
 
 	triplets.push_back(T(3 * mP1 + 0, 3 * mP1 + 0, mStiffness));
 	triplets.push_back(T(3 * mP1 + 1, 3 * mP1 + 1, mStiffness));

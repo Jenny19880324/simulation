@@ -24,20 +24,14 @@ int main(int argc, const char **argv) {
 	massMatrix.coeffRef(4, 4) = 1.0;
 	massMatrix.coeffRef(5, 5) = 1.0;
 
-	std::cout << "initialPositions" << std::endl << initialPositions << std::endl;
-	std::cout << "initialVelocities" << std::endl << initialVelocities << std::endl;
-	std::cout << "massMatrix" << std::endl << massMatrix << std::endl;
-
-
-
 
 	Solver sim(initialPositions, initialVelocities, massMatrix, constraints);
 
-	sim.setIntegrator(BackwardEuler::Instance(&sim));
+	sim.setIntegrator(ImplicitMidpoint::Instance(&sim));
 
-	BackwardEuler::Instance(&sim)->setMinimizationMethod(ProjectiveDynamics::Instance());
+	ImplicitMidpoint::Instance(&sim)->setMinimizationMethod(NewtonsMethod::Instance());
 
-	ProjectiveDynamics::Instance()->setMinimizationExpression(RayleighDamping::Instance(&sim));
+	NewtonsMethod::Instance()->setMinimizationExpression(RayleighDamping::Instance(&sim));
 
 	RayleighDamping::Instance(&sim)->setLineSearch(NoLineSearch::Instance(BackwardEuler::Instance(&sim)));
 	

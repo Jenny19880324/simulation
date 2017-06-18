@@ -13,7 +13,7 @@ public:
 	virtual double evaluateEnergy(const VectorX &) const = 0;
 	virtual void evaluateGradient(const VectorX &, VectorX &) const = 0;
 	virtual void evaluateHessian(const VectorX &, std::vector<T> &) const = 0;
-	virtual void evaluateLaplacian(const VectorX &, std::vector<T> &) const = 0;
+	virtual void evaluateLaplacian(std::vector<T> &) const = 0;
 
 protected:
 	ConstraintInterface(){}
@@ -28,7 +28,7 @@ public:
 	double evaluateEnergy(const VectorX &) const override;
 	void evaluateGradient(const VectorX &, VectorX &) const override;
 	void evaluateHessian(const VectorX &, std::vector<T> &) const override;
-	void evaluateLaplacian(const VectorX &, std::vector<T> &) const override;
+	void evaluateLaplacian(std::vector<T> &) const override;
 	
 private:
 	double mStiffness;

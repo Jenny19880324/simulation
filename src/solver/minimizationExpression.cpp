@@ -3,6 +3,7 @@
 #include "lineSearch.h"
 #include "constraint.h"
 #include "solver.h"
+#include "integrator.h"
 
 MinimizationExpressionInterface *RayleighDamping::instance__ = 0;
 
@@ -16,41 +17,79 @@ MinimizationExpressionInterface *RayleighDamping::Instance(const Solver *solver)
 
 
 RayleighDamping::RayleighDamping(const Solver *solver) : mSolver(solver) {
+	NoDamping::Instance(mSolver)->evaluateLaplacian(mDampingMatrix);
 
-
+	std::cout << "mDampingMatrix" << std::endl << mDampingMatrix << std::endl;
 }
 
 
 double RayleighDamping::evaluateEnergy(const VectorX &x) const {
 	std::cout << "RayleighDamping evaluateEnergy" << std::endl;
-	//double energy = NoDamping::Instance()->evaluateEnergy(x);
 
-	//VectorX vnp1 = 2 * (x - m_mesh->m_current_positions) - m_mesh->m_current_velocities * m_h;
-	//VectorX vnp1 = 2.0 / mH * (x - mCurrentPositions) - mCurrentVelocities;
-	//energy += 0.5 * mHSquare * vnp1.transpose() * mDampingMatrix * vnp1;
+	double energy = NoDamping::Instance(mSolver)->evaluateEnergy(x);
 
-	return 0.0;
+	double h = mSolver->getH();
+	const VectorX &currentPositions = mSolver->getCurrentPositions();
+	const VectorX &currentVelocities = mSolver->getCurrentVelocities();
+
+	VectorX v = 2.0 / h * (x - currentPositions) - currentVelocities;
+
+	energy += 0.5 * h * h * v.transpose() * mDampingMatrix * v;
+
+	return energy;
 }
 
 
 void RayleighDamping::evaluateGradient(const VectorX &x, VectorX &gradient) const {
 	std::cout << "RayleighDamping evaluateGradient" << std::endl;
+
+	NoDamping::Instance(mSolver)->evaluateGradient(x, gradient);
+
+	VectorX appendedGradient; 
+
+	const ImplicitIntegratorInterface *integrator = dynamic_cast<const ImplicitIntegratorInterface *>(mSolver->getIntegrator()); 
+	
+	integrator->evaluateAppendedExpressionGradient(mDampingMatrix, x, appendedGradient);
+
+	gradient += appendedGradient;
 }
 
 
 void RayleighDamping::evaluateHessian(const VectorX &x, SpMat &hessian) const {
 	std::cout << "RayleighDamping evaluateHessian" << std::endl;
+
+	NoDamping::Instance(mSolver)->evaluateHessian(x, hessian);
+
+	SpMat appendedHessian;
+
+	const ImplicitIntegratorInterface *integrator = dynamic_cast<const ImplicitIntegratorInterface *>(mSolver->getIntegrator());
+
+	integrator->evaluateAppendedExpressionHessian(mDampingMatrix, appendedHessian);
+
+	hessian += appendedHessian;
+
 };
 
 
-void RayleighDamping::evaluateLaplacian(const VectorX &x, SpMat &laplacian) const {
+void RayleighDamping::evaluateLaplacian(SpMat &laplacian) const {
 	std::cout << "RayleighDamping evaluateLaplacian" << std::endl;
+
+	NoDamping::Instance(mSolver)->evaluateLaplacian(laplacian);
+
+	SpMat appendedLaplacian;
+
+	const ImplicitIntegratorInterface *integrator = dynamic_cast<const ImplicitIntegratorInterface *>(mSolver->getIntegrator());
+
+	integrator->evaluateAppendedExpressionLaplacian(mDampingMatrix, laplacian);
+
+	laplacian += appendedLaplacian;
 }
 
 
-double RayleighDamping::lineSearch(const VectorX &x, const VectorX &, const VectorX &) const {
+double RayleighDamping::lineSearch(const VectorX &x, const VectorX &gradient, const VectorX &descentDir) const {
 	std::cout << "RayleighDamping lineSearch" << std::endl;
-	return 0;
+
+	return mLineSearch->lineSearch(x, gradient, descentDir);
 }
 
 void RayleighDamping::setLineSearch(LineSearchInterface *lineSearch) {
@@ -103,7 +142,7 @@ void NoDamping::evaluateGradient(const VectorX &x, VectorX &gradient) const {
 }
 
 
-void NoDamping::evaluateLaplacian(const VectorX &x, SpMat &laplacian) const {
+void NoDamping::evaluateLaplacian(SpMat &laplacian) const {
 	std::cout << "NoDamping evaluateLaplacian" << std::endl;
 
 	const std::vector<ConstraintInterface *> &constraints = mSolver->getConstraints();
@@ -111,7 +150,7 @@ void NoDamping::evaluateLaplacian(const VectorX &x, SpMat &laplacian) const {
 	std::vector<T> triplets;
 
 	for (auto constraint : constraints) {
-		constraint->evaluateLaplacian(x, triplets);
+		constraint->evaluateLaplacian(triplets);
 	}
 
 	laplacian.setFromTriplets(triplets.begin(), triplets.end());
