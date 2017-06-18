@@ -1,0 +1,1 @@
+#define EXIT_CONDITION 1e-8

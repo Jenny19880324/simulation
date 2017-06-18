@@ -21,23 +21,25 @@ list(APPEND NANOGUI_EXTRA_LIBS opengl32)
 
 set(MAIN_INCLUDE_DIRECTORIES "")
 list(APPEND MAIN_INCLUDE_DIRECTORIES 
-"${CMAKE_CURRENT_SOURCE_DIR}/include")
+"${CMAKE_CURRENT_SOURCE_DIR}/include"
+"${CMAKE_CURRENT_SOURCE_DIR}/include/eigen"
+"${CMAKE_CURRENT_SOURCE_DIR}/include/solver")
 
 
 ###############################################################################
-#deformable library
+#solver library
 ###############################################################################
-set(DEFORMABLE_SRC_DIR src/deformable)
-set(DEFORMABLE_BIN_DIR deformable)
-add_subdirectory(${DEFORMABLE_SRC_DIR} ${DEFORMABLE_BIN_DIR})
+set(SOLVER_SRC_DIR src/solver)
+set(SOLVER_BIN_DIR solver)
+add_subdirectory(${SOLVER_SRC_DIR} ${SOLVER_BIN_DIR})
 
 
 ###############################################################################
 #the application
 ###############################################################################
 add_executable(main src/main.cpp)
-target_link_libraries(main debug deformable debug ${DEBUG_NANOGUI_LIB} ${NANOGUI_EXTRA_LIBS})
-target_link_libraries(main optimized deformable optimized ${RELEASE_NANOGUI_LIB} ${NANOGUI_EXTRA_LIBS})
+target_link_libraries(main debug solver debug ${DEBUG_NANOGUI_LIB} ${NANOGUI_EXTRA_LIBS})
+target_link_libraries(main optimized solver optimized ${RELEASE_NANOGUI_LIB} ${NANOGUI_EXTRA_LIBS})
 
 target_include_directories(main PUBLIC "${MAIN_INCLUDE_DIRECTORIES}")
 
@@ -53,9 +55,9 @@ COMMAND ${CMAKE_COMMAND} -E copy_directory
 "${CMAKE_CURRENT_SOURCE_DIR}/extern/dll/$<CONFIGURATION>"
 $<TARGET_FILE_DIR:main>)
 
-#COPY deformable library DLL to exe folder
+#COPY solver library DLL to exe folder
 
 add_custom_command(TARGET main POST_BUILD
 COMMAND ${CMAKE_COMMAND} -E copy_if_different
-"${DEFORMABLE_BIN_DIR}/$<CONFIGURATION>/deformable.dll"
+"${SOLVER_BIN_DIR}/$<CONFIGURATION>/solver.dll"
 $<TARGET_FILE_DIR:main>)

@@ -1,0 +1,24 @@
+###############################################################################
+#deformable library
+###############################################################################
+
+add_definitions(-D_EXPORTING)
+
+#the solver object library
+
+add_library(solver-obj OBJECT 
+solver.cpp
+integrator.cpp
+minimizationMethod.cpp
+minimizationExpression.cpp
+lineSearch.cpp
+constraint.cpp)
+
+target_include_directories(solver-obj PUBLIC "${MAIN_INCLUDE_DIRECTORIES}")
+
+
+#the solver library
+
+add_library(solver SHARED
+$<TARGET_OBJECTS:solver-obj>)
+

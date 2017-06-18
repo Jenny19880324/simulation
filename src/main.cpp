@@ -1,18 +1,18 @@
 #include "integrator.h"
 #include "minimizationMethod.h"
-#include "simulation.h"
+#include "solver.h"
 #include "minimizationExpression.h"
 #include "lineSearch.h"
 
 int main(int argc, const char **argv) {
-	Simulation sim;
-	sim.setIntegrator(BackwardEuler::Instance());
+	Solver sim;
+	sim.setIntegrator(BackwardEuler::Instance(&sim));
 
-	BackwardEuler::Instance()->setMinimizationMethod(ProjectiveDynamics::Instance());
+	BackwardEuler::Instance(&sim)->setMinimizationMethod(ProjectiveDynamics::Instance());
 
-	ProjectiveDynamics::Instance()->setMinimizationExpression(RayleighDamping::Instance());
+	ProjectiveDynamics::Instance()->setMinimizationExpression(RayleighDamping::Instance(&sim));
 
-	RayleighDamping::Instance()->setLineSearch(NoLineSearch::Instance());
+	RayleighDamping::Instance(&sim)->setLineSearch(NoLineSearch::Instance(BackwardEuler::Instance(&sim)));
 	
 
 	
