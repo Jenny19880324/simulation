@@ -40,6 +40,8 @@ private:
 
 	unsigned mSystemDimension;
 
+	unsigned mSteps;
+
 	double mH;
 
 	VectorX mCurrentPositions;

@@ -9,13 +9,22 @@ mCurrentPositions(initialPositions), mCurrentVelocities(initialVelocities), mMas
 
 
 void Solver::update() {
-	mIntegrator->update();
 
-	Eigen::Vector3d angularMomentum = Eigen::Vector3d::Zero();
+	bool converged = true;
 
-	computeAngularMomentum(mCurrentPositions, mCurrentVelocities, angularMomentum);
+	//TODO remove this assignment
+	mSteps = 100;
 
-	std::cout << "angularMomentum = " << angularMomentum.transpose() << std::endl;
+	for (unsigned i = 0; i < mSteps && converged; i++) {
+		converged = mIntegrator->update();
+
+		Eigen::Vector3d angularMomentum = Eigen::Vector3d::Zero();
+		computeAngularMomentum(mCurrentPositions, mCurrentVelocities, angularMomentum);
+		std::cout << "angularMomentum = " << angularMomentum.transpose() << std::endl;
+	}
+	
+
+
 }
 
 

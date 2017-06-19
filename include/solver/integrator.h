@@ -14,7 +14,7 @@ class Solver;
 class CLASS_DECLSPEC IntegratorInterface{
 public:
 	virtual ~IntegratorInterface(){}
-	virtual void update() = 0;
+	virtual bool update() = 0;
 
 protected:
 	IntegratorInterface(){}
@@ -33,7 +33,7 @@ protected:
 class CLASS_DECLSPEC ForwardEuler : public ExplicitIntegratorInterface {
 public:
 	static ExplicitIntegratorInterface *Instance();
-	void update() override;
+	bool update() override;
 
 private:
 	static ExplicitIntegratorInterface *instance__;
@@ -51,7 +51,7 @@ public:
 	virtual ~ImplicitIntegratorInterface(){}
 	virtual void setMinimizationMethod(MinimizationMethodInterface *) = 0;
 	virtual void setMinimizationExpression(MinimizationExpressionInterface *minimizationExpression) = 0;
-	virtual void solveMinimization(VectorX &x) = 0;
+	virtual bool solveMinimization(VectorX &x) = 0;
 	virtual double evaluateEnergy(const VectorX &) const = 0;
 	virtual void evaluateGradient(const VectorX &, VectorX &gradient) const = 0;
 	virtual void evaluateHessian(const VectorX &, SpMat &) const = 0;
@@ -75,8 +75,8 @@ public:
 
 	void setMinimizationMethod(MinimizationMethodInterface *minimizationMethod) override;
 	void setMinimizationExpression(MinimizationExpressionInterface *minimizationExpression) override;
-	void solveMinimization(VectorX &x) override;
-	void update() override;
+	bool solveMinimization(VectorX &x) override;
+	bool update() override;
 	virtual double evaluateEnergy(const VectorX &) const override;
 	void evaluateGradient(const VectorX &, VectorX &) const override;
 	void evaluateHessian(const VectorX &, SpMat &) const override;
@@ -106,8 +106,8 @@ public:
 
 	void setMinimizationMethod(MinimizationMethodInterface *minimizationMethod) override;
 	void setMinimizationExpression(MinimizationExpressionInterface *minimizationExpression) override;
-	void solveMinimization(VectorX &x) override;
-	void update() override;
+	bool solveMinimization(VectorX &x) override;
+	bool update() override;
 	double evaluateEnergy(const VectorX &) const override;
 	void evaluateGradient(const VectorX &, VectorX &) const override;
 	void evaluateHessian(const VectorX &, SpMat &) const override;
@@ -133,8 +133,8 @@ public:
 
 	void setMinimizationMethod(MinimizationMethodInterface *minimizationMethod) override;
 	void setMinimizationExpression(MinimizationExpressionInterface *minimizationExpression) override;
-	void solveMinimization(VectorX &x) override;
-	void update() override;
+	bool solveMinimization(VectorX &x) override;
+	bool update() override;
 	double evaluateEnergy(const VectorX &) const override;
 	void evaluateGradient(const VectorX &, VectorX &) const override;
 	void evaluateHessian(const VectorX &, SpMat &) const override;

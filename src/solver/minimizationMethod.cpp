@@ -31,9 +31,7 @@ void NewtonsMethod::setMinimizationExpression(MinimizationExpressionInterface *m
 }
 
 
-void NewtonsMethod::solveMinimization(ImplicitIntegratorInterface *integrator, VectorX &x){
-	std::cout << "Newton's method : solve minimization" << std::endl;
-	
+bool NewtonsMethod::solveMinimization(ImplicitIntegratorInterface *integrator, VectorX &x){
 	unsigned systemDimension = mSolver->getSystemDimension();
 
 	VectorX gradient(systemDimension); 
@@ -63,11 +61,13 @@ void NewtonsMethod::solveMinimization(ImplicitIntegratorInterface *integrator, V
 
 		if (stepSize < STEP_SIZE) {
 			std::cout << "Line search is making no progress: step size is " << stepSize << std::endl;
-			return;
+			return false;
 		}
 
 		x += stepSize * descentDir;
 	 } while (-descentDir.dot(gradient) > EXIT_CONDITION);
+
+	 return true;
 }
 
 
@@ -89,9 +89,8 @@ void ProjectiveDynamics::setMinimizationExpression(MinimizationExpressionInterfa
 }
 
 
-void ProjectiveDynamics::solveMinimization(ImplicitIntegratorInterface *integrator, VectorX &x){
-	std::cout << "ProjectiveDynamics : solve minimization" << std::endl;
-
+bool ProjectiveDynamics::solveMinimization(ImplicitIntegratorInterface *integrator, VectorX &x){
+	return true;
 }
 
 

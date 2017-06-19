@@ -16,19 +16,19 @@ MinimizationExpressionInterface *RayleighDamping::Instance(const Solver *solver)
 }
 
 
-RayleighDamping::RayleighDamping(const Solver *solver) : mSolver(solver) {
+RayleighDamping::RayleighDamping(const Solver *solver) : mSolver(solver), mDampingCoeff(1.0) {
 	unsigned systemDimension = mSolver->getSystemDimension();
 	mDampingMatrix.resize(systemDimension, systemDimension);
 
 	NoDamping::Instance(mSolver)->evaluateLaplacian(mDampingMatrix);
+
+	mDampingMatrix *= mDampingCoeff;
 
 	std::cout << "mDampingMatrix" << std::endl << mDampingMatrix << std::endl;
 }
 
 
 double RayleighDamping::evaluateEnergy(const VectorX &x) const {
-	std::cout << "RayleighDamping evaluateEnergy" << std::endl;
-
 	double energy = NoDamping::Instance(mSolver)->evaluateEnergy(x);
 
 	double h = mSolver->getH();
@@ -37,15 +37,17 @@ double RayleighDamping::evaluateEnergy(const VectorX &x) const {
 
 	VectorX v = 2.0 / h * (x - currentPositions) - currentVelocities;
 
-	energy += 0.5 * h * h * v.transpose() * mDampingMatrix * v;
+	double appendedEnergy = 0.5 * h * h * v.transpose() * mDampingMatrix * v;
+	//std::cout << "mDampingMatrix = " << std::endl << mDampingMatrix << std::endl;
+	//std::cout << "v = " << v.transpose() << std::endl;
+	//std::cout << "appendedEnergy = " << appendedEnergy << std::endl;
+	energy += appendedEnergy;
 
 	return energy;
 }
 
 
 void RayleighDamping::evaluateGradient(const VectorX &x, VectorX &gradient) const {
-	std::cout << "RayleighDamping evaluateGradient" << std::endl;
-
 	NoDamping::Instance(mSolver)->evaluateGradient(x, gradient);
 
 	VectorX appendedGradient; 
@@ -59,8 +61,6 @@ void RayleighDamping::evaluateGradient(const VectorX &x, VectorX &gradient) cons
 
 
 void RayleighDamping::evaluateHessian(const VectorX &x, SpMat &hessian) const {
-	std::cout << "RayleighDamping evaluateHessian" << std::endl;
-
 	NoDamping::Instance(mSolver)->evaluateHessian(x, hessian);
 
 	SpMat appendedHessian;
@@ -75,8 +75,6 @@ void RayleighDamping::evaluateHessian(const VectorX &x, SpMat &hessian) const {
 
 
 void RayleighDamping::evaluateLaplacian(SpMat &laplacian) const {
-	std::cout << "RayleighDamping evaluateLaplacian" << std::endl;
-
 	NoDamping::Instance(mSolver)->evaluateLaplacian(laplacian);
 
 	SpMat appendedLaplacian;
@@ -90,8 +88,6 @@ void RayleighDamping::evaluateLaplacian(SpMat &laplacian) const {
 
 
 double RayleighDamping::lineSearch(const VectorX &x, const VectorX &gradient, const VectorX &descentDir) const {
-	std::cout << "RayleighDamping lineSearch" << std::endl;
-
 	return mLineSearch->lineSearch(x, gradient, descentDir);
 }
 
@@ -119,8 +115,6 @@ NoDamping::NoDamping(const Solver *solver): mSolver(solver) {
 
 
 double NoDamping::evaluateEnergy(const VectorX &x) const {
-	std::cout << "NoDamping evaluateEnergy" << std::endl;
-
 	double energy = 0.0;
 
 	const std::vector<ConstraintInterface *> &constraints = mSolver->getConstraints();
@@ -134,8 +128,6 @@ double NoDamping::evaluateEnergy(const VectorX &x) const {
 
 
 void NoDamping::evaluateGradient(const VectorX &x, VectorX &gradient) const {
-	std::cout << "NoDamping evaluateGradient" << std::endl;
-
 	const std::vector<ConstraintInterface *> &constraints = mSolver->getConstraints();
 
 	for (auto constraint : constraints) {
@@ -146,8 +138,6 @@ void NoDamping::evaluateGradient(const VectorX &x, VectorX &gradient) const {
 
 
 void NoDamping::evaluateLaplacian(SpMat &laplacian) const {
-	std::cout << "NoDamping evaluateLaplacian" << std::endl;
-
 	const std::vector<ConstraintInterface *> &constraints = mSolver->getConstraints();
 
 	std::vector<T> triplets;
@@ -161,8 +151,6 @@ void NoDamping::evaluateLaplacian(SpMat &laplacian) const {
 
 
 void NoDamping::evaluateHessian(const VectorX &x, SpMat &hessian) const {
-	std::cout << "NoDamping evaluateHessian" << std::endl;
-
 	const std::vector<ConstraintInterface *> &constraints = mSolver->getConstraints();
 
 	std::vector<T> triplets;
@@ -176,7 +164,6 @@ void NoDamping::evaluateHessian(const VectorX &x, SpMat &hessian) const {
 
 
 double NoDamping::lineSearch(const VectorX &x, const VectorX &gradient, const VectorX &descentDir) const {
-	std::cout << "NoDamping lineSearch" << std::endl;
 	return mLineSearch->lineSearch(x, gradient, descentDir);
 }
 

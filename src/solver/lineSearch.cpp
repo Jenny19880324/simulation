@@ -2,6 +2,7 @@
 #include "lineSearch.h"
 #include "integrator.h"
 #include "solver.h"
+#include "constant.h"
 
 LineSearchInterface *BacktrackingLineSearch::instance__ = 0;
 
@@ -17,8 +18,6 @@ BacktrackingLineSearch::BacktrackingLineSearch(const ImplicitIntegratorInterface
 
 
 double BacktrackingLineSearch::lineSearch(const VectorX &x, const VectorX &gradient, const VectorX &descentDir) const {
-	std::cout << "Backtracking LineSearch" << std::endl;
-
 	double alpha = 1.0;
 
 	//Armijo Condition
@@ -26,7 +25,7 @@ double BacktrackingLineSearch::lineSearch(const VectorX &x, const VectorX &gradi
 
 	double descent = gradient.dot(descentDir);
 
-	while (mIntegrator->evaluateEnergy(x + alpha * descentDir) >= energy + alpha * mRho * descent) {
+	while (mIntegrator->evaluateEnergy(x + alpha * descentDir) >= energy + alpha * mRho * descent && alpha >= STEP_SIZE) {
 		alpha *= mC;
 	}
 
@@ -52,6 +51,5 @@ NoLineSearch::NoLineSearch(const ImplicitIntegratorInterface *integrator) : mInt
 
 
 double NoLineSearch::lineSearch(const VectorX &x, const VectorX &gradient, const VectorX &descentDir) const {
-	std::cout << "NoLineSearch" << std::endl;
 	return 1.0;
 }

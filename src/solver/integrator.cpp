@@ -13,8 +13,8 @@ ExplicitIntegratorInterface *ForwardEuler::Instance() {
 	return instance__;
 }
 
-void ForwardEuler::update() {
-
+bool ForwardEuler::update() {
+	return true;
 }
 
 
@@ -54,16 +54,16 @@ void QuasiStatic::setMinimizationExpression(MinimizationExpressionInterface *min
 }
 
 
-void QuasiStatic::solveMinimization(VectorX &x) {
-	mMinimizationMethod->solveMinimization(this, x);
+bool QuasiStatic::solveMinimization(VectorX &x) {
+	return mMinimizationMethod->solveMinimization(this, x);
 }
 
 
-void QuasiStatic::update(){
+bool QuasiStatic::update(){
 	std::cout << "update QuasiStatic " << std::endl;
 
 	VectorX x;
-	solveMinimization(x);
+	return solveMinimization(x);
 }
 
 
@@ -134,16 +134,16 @@ void BackwardEuler::setMinimizationExpression(MinimizationExpressionInterface *m
 }
 
 
-void BackwardEuler::solveMinimization(VectorX &x){
-	mMinimizationMethod->solveMinimization(this, x);
+bool BackwardEuler::solveMinimization(VectorX &x){
+	return mMinimizationMethod->solveMinimization(this, x);
 }
 
 
-void BackwardEuler::update(){
+bool BackwardEuler::update(){
 	std::cout << "update BackwardEuler " << std::endl;
 
 	VectorX x;
-	solveMinimization(x);
+	return solveMinimization(x);
 }
 
 double BackwardEuler::evaluateEnergy(const VectorX &x) const {
@@ -237,16 +237,16 @@ void ImplicitMidpoint::setMinimizationExpression(MinimizationExpressionInterface
 }
 
 
-void ImplicitMidpoint::solveMinimization(VectorX &x) {
-	mMinimizationMethod->solveMinimization(this, x);
+bool ImplicitMidpoint::solveMinimization(VectorX &x) {
+	return mMinimizationMethod->solveMinimization(this, x);
 }
 
 
-void ImplicitMidpoint::update() {
-	std::cout << "Implicit Midpoint update" << std::endl;
-
+bool ImplicitMidpoint::update() {
 	VectorX x;
-	solveMinimization(x);
+	if (!solveMinimization(x)) {
+		return false;
+	}
 
 	const VectorX &previousPositions = mSolver->getCurrentPositions();
 	const VectorX &previousVelocities = mSolver->getCurrentVelocities();
@@ -257,6 +257,10 @@ void ImplicitMidpoint::update() {
 	mSolver->setCurrentPositions(x);
 	mSolver->setCurrentVelocities(v);
 
+	std::cout << "x = " << x.transpose() << std::endl;
+	std::cout << "v = " << v.transpose() << std::endl;
+
+	return true;
 }
 
 

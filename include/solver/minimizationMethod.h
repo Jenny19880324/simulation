@@ -17,7 +17,7 @@ class Solver;
 class CLASS_DECLSPEC MinimizationMethodInterface{
 public:
 	virtual ~MinimizationMethodInterface(){}
-	virtual void solveMinimization(ImplicitIntegratorInterface *, VectorX &x) = 0;
+	virtual bool solveMinimization(ImplicitIntegratorInterface *, VectorX &x) = 0;
 	virtual void setMinimizationExpression(MinimizationExpressionInterface *minimizationExpression) = 0;
 
 protected:
@@ -33,7 +33,7 @@ public:
 	static MinimizationMethodInterface *Instance(const Solver *);
 	
 
-	void solveMinimization(ImplicitIntegratorInterface *, VectorX &x) override;
+	bool solveMinimization(ImplicitIntegratorInterface *, VectorX &x) override;
 	void setMinimizationExpression(MinimizationExpressionInterface *minimizationExpression) override;
 	void evaluateHessian(const std::vector<ConstraintInterface *> &, SpMat &hessian);
 
@@ -56,7 +56,7 @@ public:
 	
 	static MinimizationMethodInterface *Instance(const Solver *);
 	
-	void solveMinimization(ImplicitIntegratorInterface *, VectorX &x) override;
+	bool solveMinimization(ImplicitIntegratorInterface *, VectorX &x) override;
 	void setMinimizationExpression(MinimizationExpressionInterface *minimizationExpression) override;
 	void evaluateLaplacian(const std::vector<ConstraintInterface *> &, SpMat &hessian);
 
