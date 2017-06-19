@@ -16,7 +16,6 @@ public:
 	Solver(const VectorX &initialPositions, const VectorX &initialVelocities, const SpMat &massMatrix, const std::vector<ConstraintInterface *> &constraints, double h = 0.033);
 	~Solver(){}
 	
-	void update();
 	void setIntegrator(IntegratorInterface *integrator) { mIntegrator = integrator; }
 	void setH(double h) { mH = h; }
 	void setCurrentPositions(const VectorX &currentPositions) { mCurrentPositions = currentPositions; }
@@ -32,6 +31,9 @@ public:
 	const std::vector<ConstraintInterface *> &getConstraints() const { return mConstraints; }
 	unsigned getSystemDimension() const { return mSystemDimension; }
 	double getH() const { return mH; }
+
+	void update();
+	void computeAngularMomentum(const VectorX &, const VectorX &, Eigen::Vector3d &);
 	
 private:
 	IntegratorInterface *mIntegrator;

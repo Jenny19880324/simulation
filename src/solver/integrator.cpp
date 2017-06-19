@@ -252,10 +252,10 @@ void ImplicitMidpoint::update() {
 	const VectorX &previousVelocities = mSolver->getCurrentVelocities();
 	double h = mSolver->getH();
 
-	VectorX currentVelocities = (x - previousPositions) * 2 / h - previousVelocities;
+	VectorX v = (x - previousPositions) * 2 / h - previousVelocities;
 
 	mSolver->setCurrentPositions(x);
-	mSolver->setCurrentVelocities(currentVelocities);
+	mSolver->setCurrentVelocities(v);
 
 }
 
