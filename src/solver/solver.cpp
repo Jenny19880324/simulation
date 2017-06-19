@@ -20,6 +20,8 @@ void Solver::update() {
 
 		Eigen::Vector3d angularMomentum = Eigen::Vector3d::Zero();
 		computeAngularMomentum(mCurrentPositions, mCurrentVelocities, angularMomentum);
+		std::cout << "mCurrentPositions = " << mCurrentPositions.transpose() << std::endl;
+		std::cout << "mCurrentVelocities = " << mCurrentVelocities.transpose() << std::endl;
 		std::cout << "angularMomentum = " << angularMomentum.transpose() << std::endl;
 	}
 	

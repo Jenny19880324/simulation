@@ -37,7 +37,7 @@ double RayleighDamping::evaluateEnergy(const VectorX &x) const {
 
 	VectorX v = 2.0 / h * (x - currentPositions) - currentVelocities;
 
-	double appendedEnergy = 0.5 * h * h * v.transpose() * mDampingMatrix * v;
+	double appendedEnergy = 0.5 * h * h * h * v.transpose() * mDampingMatrix * v;
 	//std::cout << "mDampingMatrix = " << std::endl << mDampingMatrix << std::endl;
 	//std::cout << "v = " << v.transpose() << std::endl;
 	//std::cout << "appendedEnergy = " << appendedEnergy << std::endl;

@@ -257,9 +257,6 @@ bool ImplicitMidpoint::update() {
 	mSolver->setCurrentPositions(x);
 	mSolver->setCurrentVelocities(v);
 
-	std::cout << "x = " << x.transpose() << std::endl;
-	std::cout << "v = " << v.transpose() << std::endl;
-
 	return true;
 }
 
@@ -318,16 +315,18 @@ void ImplicitMidpoint::evaluateAppendedExpressionGradient(const SpMat &mDampingM
 
 	VectorX v = 2.0 / h * (x - currentPositions) - currentVelocities;
 
-	gradient = 2 * h * mDampingMatrix * v;
+	gradient = 2 * h * h * mDampingMatrix * v;
 }
 
 
 void ImplicitMidpoint::evaluateAppendedExpressionHessian(const SpMat &mDampingMatrix, SpMat &hessian) const {
-	hessian = 4 * mDampingMatrix;
+	double h = mSolver->getH();
+	hessian = 4 * h * mDampingMatrix;
 }
 
 
 void ImplicitMidpoint::evaluateAppendedExpressionLaplacian(const SpMat &mDampingMatrix, SpMat &laplacian) const {
-	laplacian = 4 * mDampingMatrix;
+	double h = mSolver->getH();
+	laplacian = 4 * h * mDampingMatrix;
 }
 
