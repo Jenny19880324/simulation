@@ -7,7 +7,7 @@ mCurrentPositions(initialPositions), mCurrentVelocities(initialVelocities), mMas
 
 
 void Solver::update() {
-	mIntegrator->update(this);
+	mIntegrator->update();
 }
 
 

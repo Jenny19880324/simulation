@@ -13,7 +13,7 @@ ExplicitIntegratorInterface *ForwardEuler::Instance() {
 	return instance__;
 }
 
-void ForwardEuler::update(Solver *sim) {
+void ForwardEuler::update() {
 
 }
 
@@ -28,22 +28,42 @@ void ForwardEuler::update(Solver *sim) {
 
 ImplicitIntegratorInterface *QuasiStatic::instance__ = 0;
 
-ImplicitIntegratorInterface *QuasiStatic::Instance(){
+ImplicitIntegratorInterface *QuasiStatic::Instance(Solver *solver){
 	if(instance__ == 0){
-		instance__ = new QuasiStatic();
+		instance__ = new QuasiStatic(solver);
 	}
 	return instance__;
 }
 
 
-void QuasiStatic::solveMinimization() {
-	mMinimizationMethod->solveMinimization(this);
+QuasiStatic::QuasiStatic(Solver *solver) : mSolver(solver) {
 }
 
 
-void QuasiStatic::update(Solver *solver){
+QuasiStatic::~QuasiStatic(){
+}
+
+void QuasiStatic::setMinimizationMethod(MinimizationMethodInterface *minimizationMethod) { 
+	mMinimizationMethod = minimizationMethod; 
+}
+
+
+void QuasiStatic::setMinimizationExpression(MinimizationExpressionInterface *minimizationExpression)  { 
+	mMinimizationExpression = minimizationExpression; 
+	mMinimizationMethod->setMinimizationExpression(minimizationExpression);
+}
+
+
+void QuasiStatic::solveMinimization(VectorX &x) {
+	mMinimizationMethod->solveMinimization(this, x);
+}
+
+
+void QuasiStatic::update(){
 	std::cout << "update QuasiStatic " << std::endl;
-	solveMinimization();
+
+	VectorX x;
+	solveMinimization(x);
 }
 
 
@@ -87,7 +107,7 @@ void QuasiStatic::evaluateAppendedExpressionLaplacian(const SpMat &mDampingMatri
 ImplicitIntegratorInterface *BackwardEuler::instance__ = 0;
 
 
-ImplicitIntegratorInterface *BackwardEuler::Instance(const Solver *solver){
+ImplicitIntegratorInterface *BackwardEuler::Instance(Solver *solver){
 	if(instance__ == 0){
 		instance__ = new BackwardEuler(solver);
 	}
@@ -95,7 +115,7 @@ ImplicitIntegratorInterface *BackwardEuler::Instance(const Solver *solver){
 }
 
 
-BackwardEuler::BackwardEuler(const Solver *solver) : mSolver(solver){
+BackwardEuler::BackwardEuler(Solver *solver) : mSolver(solver){
 }
 
 
@@ -103,14 +123,27 @@ BackwardEuler::~BackwardEuler() {
 }
 
 
-void BackwardEuler::solveMinimization(){
-	mMinimizationMethod->solveMinimization(this);
+void BackwardEuler::setMinimizationMethod(MinimizationMethodInterface *minimizationMethod) {
+	mMinimizationMethod = minimizationMethod;
 }
 
 
-void BackwardEuler::update(Solver *solver){
+void BackwardEuler::setMinimizationExpression(MinimizationExpressionInterface *minimizationExpression) {
+	mMinimizationExpression = minimizationExpression;
+	mMinimizationMethod->setMinimizationExpression(minimizationExpression);
+}
+
+
+void BackwardEuler::solveMinimization(VectorX &x){
+	mMinimizationMethod->solveMinimization(this, x);
+}
+
+
+void BackwardEuler::update(){
 	std::cout << "update BackwardEuler " << std::endl;
-	solveMinimization();
+
+	VectorX x;
+	solveMinimization(x);
 }
 
 double BackwardEuler::evaluateEnergy(const VectorX &x) const {
@@ -123,7 +156,7 @@ double BackwardEuler::evaluateEnergy(const VectorX &x) const {
 
 	double inertiaTerm = 0.5 * (x - y).transpose() * massMatrix * (x - y);
 
-	return inertiaTerm + h * mMinimizationExpression->evaluateEnergy(x);
+	return inertiaTerm + h * h * mMinimizationExpression->evaluateEnergy(x);
 }
 
 
@@ -177,7 +210,7 @@ void BackwardEuler::evaluateAppendedExpressionLaplacian(const SpMat &mDampingMat
 ImplicitIntegratorInterface *ImplicitMidpoint::instance__ = 0;
 
 
-ImplicitIntegratorInterface *ImplicitMidpoint::Instance(const Solver *solver) {
+ImplicitIntegratorInterface *ImplicitMidpoint::Instance(Solver *solver) {
 	if (instance__ == 0) {
 		instance__ = new ImplicitMidpoint(solver);
 	}
@@ -185,7 +218,7 @@ ImplicitIntegratorInterface *ImplicitMidpoint::Instance(const Solver *solver) {
 }
 
 
-ImplicitMidpoint::ImplicitMidpoint(const Solver *solver) : mSolver(solver){
+ImplicitMidpoint::ImplicitMidpoint(Solver *solver) : mSolver(solver){
 }
 
 
@@ -193,15 +226,39 @@ ImplicitMidpoint::~ImplicitMidpoint() {
 }
 
 
-void ImplicitMidpoint::solveMinimization() {
-	mMinimizationMethod->solveMinimization(this);
+void ImplicitMidpoint::setMinimizationMethod(MinimizationMethodInterface *minimizationMethod) { 
+	mMinimizationMethod = minimizationMethod;
 }
 
 
-void ImplicitMidpoint::update(Solver *solver) {
+void ImplicitMidpoint::setMinimizationExpression(MinimizationExpressionInterface *minimizationExpression) {
+	mMinimizationExpression = minimizationExpression; 
+	mMinimizationMethod->setMinimizationExpression(minimizationExpression);
+}
+
+
+void ImplicitMidpoint::solveMinimization(VectorX &x) {
+	mMinimizationMethod->solveMinimization(this, x);
+}
+
+
+void ImplicitMidpoint::update() {
 	std::cout << "Implicit Midpoint update" << std::endl;
-	solveMinimization();
+
+	VectorX x;
+	solveMinimization(x);
+
+	const VectorX &previousPositions = mSolver->getCurrentPositions();
+	const VectorX &previousVelocities = mSolver->getCurrentVelocities();
+	double h = mSolver->getH();
+
+	VectorX currentVelocities = (x - previousPositions) * 2 / h - previousVelocities;
+
+	mSolver->setCurrentPositions(x);
+	mSolver->setCurrentVelocities(currentVelocities);
+
 }
+
 
 double ImplicitMidpoint::evaluateEnergy(const VectorX &x) const {
 	const VectorX &currentPositions = mSolver->getCurrentPositions();
@@ -213,7 +270,7 @@ double ImplicitMidpoint::evaluateEnergy(const VectorX &x) const {
 
 	double inertiaTerm = 0.5 * (x - y).transpose() * massMatrix * (x - y);
 
-	return inertiaTerm + h * mMinimizationExpression->evaluateEnergy((x + currentPositions) / 2);
+	return inertiaTerm + h * h * mMinimizationExpression->evaluateEnergy((x + currentPositions) / 2);
 }
 
 
@@ -226,6 +283,7 @@ void ImplicitMidpoint::evaluateGradient(const VectorX &x, VectorX &gradient) con
 	const VectorX y = currentPositions + currentVelocities * h;
 
 	mMinimizationExpression->evaluateGradient((x + currentPositions) / 2, gradient);
+
 	gradient = massMatrix * (x - y) +  h * h / 2 * gradient;
 }
 

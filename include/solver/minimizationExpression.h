@@ -53,6 +53,7 @@ private:
 
 	const Solver *mSolver;
 
+
 	SpMat mDampingMatrix;
 };
 

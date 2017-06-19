@@ -25,35 +25,51 @@ MinimizationMethodInterface *NewtonsMethod::Instance(const Solver *solver) {
 	return instance__;
 }
 
-void NewtonsMethod::solveMinimization(ImplicitIntegratorInterface *integrator){
+
+void NewtonsMethod::setMinimizationExpression(MinimizationExpressionInterface *minimizationExpression) {
+	mMinimizationExpression = minimizationExpression;
+}
+
+
+void NewtonsMethod::solveMinimization(ImplicitIntegratorInterface *integrator, VectorX &x){
 	std::cout << "Newton's method : solve minimization" << std::endl;
 	
-	VectorX gradient;
-	SpMat hessian;
-	VectorX descentDir;
+	unsigned systemDimension = mSolver->getSystemDimension();
+
+	VectorX gradient(systemDimension); 
+	VectorX descentDir(systemDimension);
+	SpMat hessian(systemDimension, systemDimension);
+
+	gradient.setZero();
+	descentDir.setZero();
+	hessian.setZero();
+	
 
 	const VectorX &currentPositions = mSolver->getCurrentPositions();
 	const VectorX &currentVelocities = mSolver->getCurrentVelocities();
 	double h = mSolver->getH();
 
-	VectorX x = currentPositions + currentVelocities * h;
+	x = currentPositions + currentVelocities * h;
 
-	while (-descentDir.dot(gradient) > EXIT_CONDITION) {
+	 do {
 		integrator->evaluateGradient(x, gradient);
 		integrator->evaluateHessian(x, hessian);
 
 		mSparseLinearSystemSolver.analyzePattern(hessian);
 		mSparseLinearSystemSolver.factorize(hessian);
 		descentDir = - mSparseLinearSystemSolver.solve(gradient);
-		mMinimizationExpression->lineSearch(x, gradient, descentDir);
 
-	}
-	
+		double stepSize = mMinimizationExpression->lineSearch(x, gradient, descentDir);
+
+		if (stepSize < STEP_SIZE) {
+			std::cout << "Line search is making no progress: step size is " << stepSize << std::endl;
+			return;
+		}
+
+		x += stepSize * descentDir;
+	 } while (-descentDir.dot(gradient) > EXIT_CONDITION);
 }
 
-void NewtonsMethod::setMinimizationExpression(MinimizationExpressionInterface *minimizationExpression) {
-	mMinimizationExpression = minimizationExpression;
-}
 
 
 
@@ -68,7 +84,12 @@ MinimizationMethodInterface *ProjectiveDynamics::Instance(const Solver *solver) 
 }
 
 
-void ProjectiveDynamics::solveMinimization(ImplicitIntegratorInterface *integrator){
+void ProjectiveDynamics::setMinimizationExpression(MinimizationExpressionInterface *minimizationExpression) {
+	mMinimizationExpression = minimizationExpression;
+}
+
+
+void ProjectiveDynamics::solveMinimization(ImplicitIntegratorInterface *integrator, VectorX &x){
 	std::cout << "ProjectiveDynamics : solve minimization" << std::endl;
 
 }
@@ -82,6 +103,3 @@ ProjectiveDynamics::~ProjectiveDynamics() {
 }
 
 
-void ProjectiveDynamics::setMinimizationExpression(MinimizationExpressionInterface *minimizationExpression) {
-	mMinimizationExpression = minimizationExpression;
-}

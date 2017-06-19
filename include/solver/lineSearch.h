@@ -22,17 +22,19 @@ protected:
 
 class CLASS_DECLSPEC BacktrackingLineSearch : public LineSearchInterface {
 public:
-	static LineSearchInterface *Instance(const Solver *);
+	static LineSearchInterface *Instance(const ImplicitIntegratorInterface *);
 
 	virtual double lineSearch(const VectorX &x, const VectorX &gradient, const VectorX &descentDir) const override;
-
+	void setRho(double rho) { mRho = rho; }
+	void setC(double c) { mC = c; }
+	
 protected:
-	BacktrackingLineSearch(const Solver *);
+	BacktrackingLineSearch(const ImplicitIntegratorInterface *);
 
 private:
 	static LineSearchInterface *instance__;
 
-	const Solver *mSolver;
+	const ImplicitIntegratorInterface *mIntegrator;
 
 	double mRho;  //to determine how much the energy should decrease
 	double mC;    //to scale down step size
@@ -41,15 +43,15 @@ private:
 
 class CLASS_DECLSPEC NoLineSearch : public LineSearchInterface {
 public:
-	static LineSearchInterface *Instance(const Solver *);
+	static LineSearchInterface *Instance(const ImplicitIntegratorInterface *);
 
 	virtual  double lineSearch(const VectorX &x, const VectorX &gradient, const VectorX &descentDir) const override;
 
 protected:
-	NoLineSearch(const Solver *);
+	NoLineSearch(const ImplicitIntegratorInterface *);
 
 private:
 	static LineSearchInterface *instance__;
 
-	const Solver *mSolver;
+	const ImplicitIntegratorInterface *mIntegrator;
 };
