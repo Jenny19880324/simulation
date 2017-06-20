@@ -152,6 +152,9 @@ RayleighDamping::RayleighDamping(const Solver *solver) : mSolver(solver), mDampi
 
 	PureConstraint::Instance(mSolver)->evaluateLaplacian(mDampingMatrix);
 
+	//VectorX currentPositions = mSolver->getCurrentPositions();
+	//PureConstraint::Instance(mSolver)->evaluateHessian(currentPositions, mDampingMatrix);
+
 	mDampingMatrix *= mDampingCoeff;
 
 	std::cout << "mDampingMatrix" << std::endl << mDampingMatrix << std::endl;
@@ -189,15 +192,10 @@ void RayleighDamping::evaluateHessian(const VectorX &x, SpMat &hessian) const {
 
 
 void RayleighDamping::evaluateLaplacian(SpMat &laplacian) const {
-	NoDamping::Instance(mSolver)->evaluateLaplacian(laplacian);
-
-	SpMat appendedLaplacian;
 
 	const ImplicitIntegratorInterface *integrator = dynamic_cast<const ImplicitIntegratorInterface *>(mSolver->getIntegrator());
 
 	integrator->evaluateAppendedExpressionLaplacian(mDampingMatrix, laplacian);
-
-	laplacian += appendedLaplacian;
 }
 
 

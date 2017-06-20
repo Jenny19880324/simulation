@@ -31,11 +31,11 @@ int main(int argc, const char **argv) {
 
 	sim.setIntegrator(ImplicitMidpoint::Instance(&sim));
 
-	ImplicitMidpoint::Instance(&sim)->setMinimizationMethod(NewtonsMethod::Instance(&sim));
+	ImplicitMidpoint::Instance(&sim)->setMinimizationMethod(ProjectiveDynamics::Instance(&sim));
 
 	ImplicitMidpoint::Instance(&sim)->setMinimizationExpression(RayleighDamping::Instance(&sim));
 
-	NewtonsMethod::Instance(&sim)->setMinimizationExpression(RayleighDamping::Instance(&sim));
+	ProjectiveDynamics::Instance(&sim)->setMinimizationExpression(RayleighDamping::Instance(&sim));
 
 	RayleighDamping::Instance(&sim)->setLineSearch(BacktrackingLineSearch::Instance(ImplicitMidpoint::Instance(&sim)));
 	

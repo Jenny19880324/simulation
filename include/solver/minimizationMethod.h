@@ -39,11 +39,8 @@ public:
 
 private:
 	static MinimizationMethodInterface *instance__;
-
 	MinimizationExpressionInterface *mMinimizationExpression;
-
 	const Solver *mSolver;
-
 	Eigen::SimplicialLLT<SpMat, Eigen::Upper> mSparseLinearSystemSolver;
 
 };
@@ -62,9 +59,8 @@ public:
 
 private:
 	static MinimizationMethodInterface *instance__;
-
 	MinimizationExpressionInterface *mMinimizationExpression;
-
 	const Solver *mSolver;
+	Eigen::SimplicialLLT<SpMat, Eigen::Upper> mSparseLinearSystemSolver;
 
 };

@@ -90,9 +90,6 @@ void ProjectiveDynamics::setMinimizationExpression(MinimizationExpressionInterfa
 }
 
 
-bool ProjectiveDynamics::solveMinimization(ImplicitIntegratorInterface *integrator, VectorX &x){
-	return true;
-}
 
 
 ProjectiveDynamics::ProjectiveDynamics(const Solver *solver) : mSolver(solver) {
@@ -100,6 +97,47 @@ ProjectiveDynamics::ProjectiveDynamics(const Solver *solver) : mSolver(solver) {
 
 ProjectiveDynamics::~ProjectiveDynamics() {
 
+}
+
+
+
+bool ProjectiveDynamics::solveMinimization(ImplicitIntegratorInterface *integrator, VectorX &x) {
+	unsigned systemDimension = mSolver->getSystemDimension();
+
+	VectorX gradient(systemDimension);
+	VectorX descentDir(systemDimension);
+	SpMat laplacian(systemDimension, systemDimension);
+
+	gradient.setZero();
+	descentDir.setZero();
+	integrator->evaluateLaplacian(laplacian);
+
+	mSparseLinearSystemSolver.analyzePattern(laplacian);
+	mSparseLinearSystemSolver.factorize(laplacian);
+
+	const VectorX &currentPositions = mSolver->getCurrentPositions();
+	const VectorX &currentVelocities = mSolver->getCurrentVelocities();
+	double h = mSolver->getH();
+
+	x = currentPositions + currentVelocities * h;
+
+	do {
+		integrator->evaluateGradient(x, gradient);
+
+		descentDir = -mSparseLinearSystemSolver.solve(gradient);
+
+		double stepSize = mMinimizationExpression->lineSearch(x, gradient, descentDir);
+
+		if (stepSize < STEP_SIZE) {
+			std::cout << "Line search is making no progress: step size is " << stepSize << std::endl;
+			std::cout << "gradient = " << gradient.transpose() << std::endl;
+			return false;
+		}
+
+		x += stepSize * descentDir;
+	} while (-descentDir.dot(gradient) > EXIT_CONDITION);
+
+	return true;
 }
 
 
