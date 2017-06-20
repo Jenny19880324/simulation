@@ -107,16 +107,22 @@ double NoDamping::evaluateEnergy(const VectorX &x) const {
 
 
 void NoDamping::evaluateGradient(const VectorX &x, VectorX &gradient) const {
+	unsigned systemDimension = mSolver->getSystemDimension();
+	gradient.resize(systemDimension);
 	gradient.setZero();
 }
 
 
 void NoDamping::evaluateLaplacian(SpMat &laplacian) const {
+	unsigned systemDimension = mSolver->getSystemDimension();
+	laplacian.resize(systemDimension, systemDimension);
 	laplacian.setZero();
 }
 
 
 void NoDamping::evaluateHessian(const VectorX &x, SpMat &hessian) const {
+	unsigned systemDimension = mSolver->getSystemDimension();
+	hessian.resize(systemDimension, systemDimension);
 	hessian.setZero();
 }
 

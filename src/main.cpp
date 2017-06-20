@@ -33,11 +33,11 @@ int main(int argc, const char **argv) {
 
 	ImplicitMidpoint::Instance(&sim)->setMinimizationMethod(ProjectiveDynamics::Instance(&sim));
 
-	ImplicitMidpoint::Instance(&sim)->setMinimizationExpression(RayleighDamping::Instance(&sim));
+	ImplicitMidpoint::Instance(&sim)->setMinimizationExpression(NoDamping::Instance(&sim));
 
-	ProjectiveDynamics::Instance(&sim)->setMinimizationExpression(RayleighDamping::Instance(&sim));
+	ProjectiveDynamics::Instance(&sim)->setMinimizationExpression(NoDamping::Instance(&sim));
 
-	RayleighDamping::Instance(&sim)->setLineSearch(BacktrackingLineSearch::Instance(ImplicitMidpoint::Instance(&sim)));
+	NoDamping::Instance(&sim)->setLineSearch(BacktrackingLineSearch::Instance(ImplicitMidpoint::Instance(&sim)));
 	
 
 	sim.update();
