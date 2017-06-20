@@ -30,7 +30,7 @@ protected:
 };
 
 
-class CLASS_DECLSPEC RayleighDamping : public MinimizationExpressionInterface {
+class CLASS_DECLSPEC PureConstraint : public MinimizationExpressionInterface {
 public:
 	static MinimizationExpressionInterface *Instance(const Solver *);
 
@@ -43,20 +43,16 @@ public:
 	void setLineSearch(LineSearchInterface *) override;
 
 protected:
-	RayleighDamping(const Solver *);
+	PureConstraint(const Solver *solver);
 
 private:
-
 	static MinimizationExpressionInterface *instance__;
-	
 	LineSearchInterface *mLineSearch;
-
 	const Solver *mSolver;
-
-	SpMat mDampingMatrix;
-
-	double mDampingCoeff;
 };
+
+
+
 
 
 class CLASS_DECLSPEC NoDamping : public MinimizationExpressionInterface {
@@ -76,12 +72,35 @@ protected:
 
 private:
 	static MinimizationExpressionInterface *instance__;
-	
+	LineSearchInterface *mLineSearch;
+	const Solver *mSolver;
+};
+
+
+class CLASS_DECLSPEC RayleighDamping : public MinimizationExpressionInterface {
+public:
+	static MinimizationExpressionInterface *Instance(const Solver *);
+
+	double evaluateEnergy(const VectorX &) const override;
+	void evaluateGradient(const VectorX &, VectorX &) const override;
+	void evaluateLaplacian(SpMat &) const override;
+	void evaluateHessian(const VectorX &, SpMat &) const override;
+	double lineSearch(const VectorX &, const VectorX &, const VectorX &) const override;
+
+	void setLineSearch(LineSearchInterface *) override;
+
+protected:
+	RayleighDamping(const Solver *);
+
+private:
+
+	static MinimizationExpressionInterface *instance__;
+
 	LineSearchInterface *mLineSearch;
 
 	const Solver *mSolver;
 
+	SpMat mDampingMatrix;
 
-
-
+	double mDampingCoeff;
 };

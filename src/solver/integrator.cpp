@@ -271,7 +271,7 @@ double ImplicitMidpoint::evaluateEnergy(const VectorX &x) const {
 
 	double inertiaTerm = 0.5 * (x - y).transpose() * massMatrix * (x - y);
 
-	double energy = NoDamping::Instance(mSolver)->evaluateEnergy((x + currentPositions) / 2);
+	double energy = PureConstraint::Instance(mSolver)->evaluateEnergy((x + currentPositions) / 2);
 
 	double dampingEnergy = mMinimizationExpression->evaluateEnergy(x);
 
@@ -287,7 +287,7 @@ void ImplicitMidpoint::evaluateGradient(const VectorX &x, VectorX &gradient) con
 
 	const VectorX y = currentPositions + currentVelocities * h;
 
-	NoDamping::Instance(mSolver)->evaluateGradient((x + currentPositions) / 2, gradient);
+	PureConstraint::Instance(mSolver)->evaluateGradient((x + currentPositions) / 2, gradient);
 
 	VectorX dampingGradient;
 	mMinimizationExpression->evaluateGradient(x, dampingGradient);
@@ -301,11 +301,11 @@ void ImplicitMidpoint::evaluateHessian(const VectorX &x, SpMat &hessian) const {
 	const SpMat &massMatrix = mSolver->getMassMatrix();
 	double h = mSolver->getH();
 
-	NoDamping::Instance(mSolver)->evaluateHessian((x + currentPositions) / 2, hessian);
+	PureConstraint::Instance(mSolver)->evaluateHessian((x + currentPositions) / 2, hessian);
 
 	SpMat dampingHessian;
-
 	mMinimizationExpression->evaluateHessian(x, dampingHessian);
+
 	hessian = massMatrix + h * h / 4 * hessian + h * h *dampingHessian;
 }
 
@@ -314,8 +314,12 @@ void ImplicitMidpoint::evaluateLaplacian(SpMat &laplacian) const {
 	const SpMat &massMatrix = mSolver->getMassMatrix();
 	double h = mSolver->getH();
 
-	mMinimizationExpression->evaluateLaplacian(laplacian);
-	laplacian = massMatrix + h * h / 4 * laplacian;
+	PureConstraint::Instance(mSolver)->evaluateLaplacian(laplacian);
+
+	SpMat dampingLaplacian;
+	mMinimizationExpression->evaluateLaplacian(dampingLaplacian);
+
+	laplacian = massMatrix + h * h / 4 * laplacian + h * h * dampingLaplacian;
 }
 
 

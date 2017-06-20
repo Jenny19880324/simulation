@@ -5,6 +5,136 @@
 #include "solver.h"
 #include "integrator.h"
 
+
+
+MinimizationExpressionInterface *PureConstraint::instance__ = 0;
+
+
+MinimizationExpressionInterface *PureConstraint::Instance(const Solver *solver) {
+	if (instance__ == 0) {
+		instance__ = new PureConstraint(solver);
+	}
+	return instance__;
+}
+
+
+PureConstraint::PureConstraint(const Solver *solver) : mSolver(solver) {
+}
+
+
+double PureConstraint::evaluateEnergy(const VectorX &x) const {
+	double energy = 0.0;
+
+	const std::vector<ConstraintInterface *> &constraints = mSolver->getConstraints();
+
+	for (auto constraint : constraints) {
+		energy += constraint->evaluateEnergy(x);
+	}
+
+	return energy;
+}
+
+
+void PureConstraint::evaluateGradient(const VectorX &x, VectorX &gradient) const {
+	const std::vector<ConstraintInterface *> &constraints = mSolver->getConstraints();
+
+	for (auto constraint : constraints) {
+		constraint->evaluateGradient(x, gradient);
+	}
+}
+
+
+void PureConstraint::evaluateLaplacian(SpMat &laplacian) const {
+	const std::vector<ConstraintInterface *> &constraints = mSolver->getConstraints();
+
+	std::vector<T> triplets;
+
+	for (auto constraint : constraints) {
+		constraint->evaluateLaplacian(triplets);
+	}
+
+	laplacian.setFromTriplets(triplets.begin(), triplets.end());
+}
+
+
+void PureConstraint::evaluateHessian(const VectorX &x, SpMat &hessian) const {
+	const std::vector<ConstraintInterface *> &constraints = mSolver->getConstraints();
+
+	std::vector<T> triplets;
+
+	for (auto constraint : constraints) {
+		constraint->evaluateHessian(x, triplets);
+	}
+
+	hessian.setFromTriplets(triplets.begin(), triplets.end());
+}
+
+
+double PureConstraint::lineSearch(const VectorX &x, const VectorX &gradient, const VectorX &descentDir) const {
+	return mLineSearch->lineSearch(x, gradient, descentDir);
+}
+
+
+void PureConstraint::setLineSearch(LineSearchInterface *lineSearch) {
+	mLineSearch = lineSearch;
+}
+
+
+
+
+
+
+
+
+MinimizationExpressionInterface *NoDamping::instance__ = 0;
+
+
+MinimizationExpressionInterface *NoDamping::Instance(const Solver *solver) {
+	if (instance__ == 0) {
+		instance__ = new NoDamping(solver);
+	}
+	return instance__;
+}
+
+
+NoDamping::NoDamping(const Solver *solver): mSolver(solver) {
+}
+
+
+double NoDamping::evaluateEnergy(const VectorX &x) const {
+	return 0.0;
+}
+
+
+void NoDamping::evaluateGradient(const VectorX &x, VectorX &gradient) const {
+	gradient.setZero();
+}
+
+
+void NoDamping::evaluateLaplacian(SpMat &laplacian) const {
+	laplacian.setZero();
+}
+
+
+void NoDamping::evaluateHessian(const VectorX &x, SpMat &hessian) const {
+	hessian.setZero();
+}
+
+
+double NoDamping::lineSearch(const VectorX &x, const VectorX &gradient, const VectorX &descentDir) const {
+	return mLineSearch->lineSearch(x, gradient, descentDir);
+}
+
+
+void NoDamping::setLineSearch(LineSearchInterface *lineSearch) {
+	mLineSearch = lineSearch;
+}
+
+
+
+
+
+
 MinimizationExpressionInterface *RayleighDamping::instance__ = 0;
 
 
@@ -20,7 +150,7 @@ RayleighDamping::RayleighDamping(const Solver *solver) : mSolver(solver), mDampi
 	unsigned systemDimension = mSolver->getSystemDimension();
 	mDampingMatrix.resize(systemDimension, systemDimension);
 
-	NoDamping::Instance(mSolver)->evaluateLaplacian(mDampingMatrix);
+	PureConstraint::Instance(mSolver)->evaluateLaplacian(mDampingMatrix);
 
 	mDampingMatrix *= mDampingCoeff;
 
@@ -43,8 +173,8 @@ double RayleighDamping::evaluateEnergy(const VectorX &x) const {
 
 void RayleighDamping::evaluateGradient(const VectorX &x, VectorX &gradient) const {
 
-	const ImplicitIntegratorInterface *integrator = dynamic_cast<const ImplicitIntegratorInterface *>(mSolver->getIntegrator()); 
-	
+	const ImplicitIntegratorInterface *integrator = dynamic_cast<const ImplicitIntegratorInterface *>(mSolver->getIntegrator());
+
 	integrator->evaluateAppendedExpressionGradient(mDampingMatrix, x, gradient);
 }
 
@@ -76,82 +206,5 @@ double RayleighDamping::lineSearch(const VectorX &x, const VectorX &gradient, co
 }
 
 void RayleighDamping::setLineSearch(LineSearchInterface *lineSearch) {
-	mLineSearch = lineSearch;
-}
-
-
-
-
-
-MinimizationExpressionInterface *NoDamping::instance__ = 0;
-
-
-MinimizationExpressionInterface *NoDamping::Instance(const Solver *solver) {
-	if (instance__ == 0) {
-		instance__ = new NoDamping(solver);
-	}
-	return instance__;
-}
-
-
-NoDamping::NoDamping(const Solver *solver): mSolver(solver) {
-}
-
-
-double NoDamping::evaluateEnergy(const VectorX &x) const {
-	double energy = 0.0;
-
-	const std::vector<ConstraintInterface *> &constraints = mSolver->getConstraints();
-
-	for (auto constraint : constraints) {
-		energy += constraint->evaluateEnergy(x);
-	}
-
-	return energy;
-}
-
-
-void NoDamping::evaluateGradient(const VectorX &x, VectorX &gradient) const {
-	const std::vector<ConstraintInterface *> &constraints = mSolver->getConstraints();
-
-	for (auto constraint : constraints) {
-		constraint->evaluateGradient(x, gradient);
-	}
-
-}
-
-
-void NoDamping::evaluateLaplacian(SpMat &laplacian) const {
-	const std::vector<ConstraintInterface *> &constraints = mSolver->getConstraints();
-
-	std::vector<T> triplets;
-
-	for (auto constraint : constraints) {
-		constraint->evaluateLaplacian(triplets);
-	}
-
-	laplacian.setFromTriplets(triplets.begin(), triplets.end());
-}
-
-
-void NoDamping::evaluateHessian(const VectorX &x, SpMat &hessian) const {
-	const std::vector<ConstraintInterface *> &constraints = mSolver->getConstraints();
-
-	std::vector<T> triplets;
-
-	for (auto constraint : constraints) {
-		constraint->evaluateHessian(x, triplets);
-	}
-
-	hessian.setFromTriplets(triplets.begin(), triplets.end());
-}
-
-
-double NoDamping::lineSearch(const VectorX &x, const VectorX &gradient, const VectorX &descentDir) const {
-	return mLineSearch->lineSearch(x, gradient, descentDir);
-}
-
-
-void NoDamping::setLineSearch(LineSearchInterface *lineSearch) {
 	mLineSearch = lineSearch;
 }
