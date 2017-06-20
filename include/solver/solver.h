@@ -34,6 +34,7 @@ public:
 
 	void update();
 	void computeAngularMomentum(const VectorX &, const VectorX &, Eigen::Vector3d &);
+	double computeHamiltonian(const VectorX &, const VectorX &);
 	
 private:
 	IntegratorInterface *mIntegrator;

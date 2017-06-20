@@ -12,7 +12,7 @@ int main(int argc, const char **argv) {
 	SpMat massMatrix(6, 6);
 	std::vector<ConstraintInterface *> constraints;
 
-	constraints.push_back(new SpringConstraint(1000.0, 1.0, 0, 1));
+	constraints.push_back(new SpringConstraint(1.0, 1.0, 0, 1));
 
 	initialPositions.setZero();
 	initialVelocities.setZero();
@@ -34,6 +34,8 @@ int main(int argc, const char **argv) {
 	ImplicitMidpoint::Instance(&sim)->setMinimizationMethod(NewtonsMethod::Instance(&sim));
 
 	ImplicitMidpoint::Instance(&sim)->setMinimizationExpression(RayleighDamping::Instance(&sim));
+
+	NewtonsMethod::Instance(&sim)->setMinimizationExpression(RayleighDamping::Instance(&sim));
 
 	RayleighDamping::Instance(&sim)->setLineSearch(BacktrackingLineSearch::Instance(ImplicitMidpoint::Instance(&sim)));
 	

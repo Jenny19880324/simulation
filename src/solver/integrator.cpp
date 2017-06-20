@@ -271,7 +271,11 @@ double ImplicitMidpoint::evaluateEnergy(const VectorX &x) const {
 
 	double inertiaTerm = 0.5 * (x - y).transpose() * massMatrix * (x - y);
 
-	return inertiaTerm + h * h * mMinimizationExpression->evaluateEnergy((x + currentPositions) / 2);
+	double energy = NoDamping::Instance(mSolver)->evaluateEnergy((x + currentPositions) / 2);
+
+	double dampingEnergy = mMinimizationExpression->evaluateEnergy(x);
+
+	return inertiaTerm + h * h * energy + h * h * dampingEnergy;
 }
 
 
@@ -283,9 +287,12 @@ void ImplicitMidpoint::evaluateGradient(const VectorX &x, VectorX &gradient) con
 
 	const VectorX y = currentPositions + currentVelocities * h;
 
-	mMinimizationExpression->evaluateGradient((x + currentPositions) / 2, gradient);
+	NoDamping::Instance(mSolver)->evaluateGradient((x + currentPositions) / 2, gradient);
 
-	gradient = massMatrix * (x - y) +  h * h / 2 * gradient;
+	VectorX dampingGradient;
+	mMinimizationExpression->evaluateGradient(x, dampingGradient);
+
+	gradient = massMatrix * (x - y) +  h * h / 2 * gradient + h * h * dampingGradient;
 }
 
 
@@ -294,8 +301,12 @@ void ImplicitMidpoint::evaluateHessian(const VectorX &x, SpMat &hessian) const {
 	const SpMat &massMatrix = mSolver->getMassMatrix();
 	double h = mSolver->getH();
 
-	mMinimizationExpression->evaluateHessian((x + currentPositions) / 2, hessian);
-	hessian = massMatrix + h * h / 4 * hessian;
+	NoDamping::Instance(mSolver)->evaluateHessian((x + currentPositions) / 2, hessian);
+
+	SpMat dampingHessian;
+
+	mMinimizationExpression->evaluateHessian(x, dampingHessian);
+	hessian = massMatrix + h * h / 4 * hessian + h * h *dampingHessian;
 }
 
 
@@ -315,13 +326,13 @@ void ImplicitMidpoint::evaluateAppendedExpressionGradient(const SpMat &mDampingM
 
 	VectorX v = 2.0 / h * (x - currentPositions) - currentVelocities;
 
-	gradient = 2 * h * h * mDampingMatrix * v;
+	gradient = 2 * mDampingMatrix * v;
 }
 
 
 void ImplicitMidpoint::evaluateAppendedExpressionHessian(const SpMat &mDampingMatrix, SpMat &hessian) const {
 	double h = mSolver->getH();
-	hessian = 4 * h * mDampingMatrix;
+	hessian = 4 * mDampingMatrix / h;
 }
 
 

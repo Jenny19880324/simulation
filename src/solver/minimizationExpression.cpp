@@ -16,7 +16,7 @@ MinimizationExpressionInterface *RayleighDamping::Instance(const Solver *solver)
 }
 
 
-RayleighDamping::RayleighDamping(const Solver *solver) : mSolver(solver), mDampingCoeff(1.0) {
+RayleighDamping::RayleighDamping(const Solver *solver) : mSolver(solver), mDampingCoeff(0.1) {
 	unsigned systemDimension = mSolver->getSystemDimension();
 	mDampingMatrix.resize(systemDimension, systemDimension);
 
@@ -29,47 +29,31 @@ RayleighDamping::RayleighDamping(const Solver *solver) : mSolver(solver), mDampi
 
 
 double RayleighDamping::evaluateEnergy(const VectorX &x) const {
-	double energy = NoDamping::Instance(mSolver)->evaluateEnergy(x);
-
 	double h = mSolver->getH();
 	const VectorX &currentPositions = mSolver->getCurrentPositions();
 	const VectorX &currentVelocities = mSolver->getCurrentVelocities();
 
 	VectorX v = 2.0 / h * (x - currentPositions) - currentVelocities;
 
-	double appendedEnergy = 0.5 * h * h * h * v.transpose() * mDampingMatrix * v;
-	//std::cout << "mDampingMatrix = " << std::endl << mDampingMatrix << std::endl;
-	//std::cout << "v = " << v.transpose() << std::endl;
-	//std::cout << "appendedEnergy = " << appendedEnergy << std::endl;
-	energy += appendedEnergy;
+	double energy = 0.5 * h * v.transpose() * mDampingMatrix * v;
 
 	return energy;
 }
 
 
 void RayleighDamping::evaluateGradient(const VectorX &x, VectorX &gradient) const {
-	NoDamping::Instance(mSolver)->evaluateGradient(x, gradient);
-
-	VectorX appendedGradient; 
 
 	const ImplicitIntegratorInterface *integrator = dynamic_cast<const ImplicitIntegratorInterface *>(mSolver->getIntegrator()); 
 	
-	integrator->evaluateAppendedExpressionGradient(mDampingMatrix, x, appendedGradient);
-
-	gradient += appendedGradient;
+	integrator->evaluateAppendedExpressionGradient(mDampingMatrix, x, gradient);
 }
 
 
 void RayleighDamping::evaluateHessian(const VectorX &x, SpMat &hessian) const {
-	NoDamping::Instance(mSolver)->evaluateHessian(x, hessian);
-
-	SpMat appendedHessian;
 
 	const ImplicitIntegratorInterface *integrator = dynamic_cast<const ImplicitIntegratorInterface *>(mSolver->getIntegrator());
 
-	integrator->evaluateAppendedExpressionHessian(mDampingMatrix, appendedHessian);
-
-	hessian += appendedHessian;
+	integrator->evaluateAppendedExpressionHessian(mDampingMatrix, hessian);
 
 };
 

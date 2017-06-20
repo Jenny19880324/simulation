@@ -61,6 +61,7 @@ bool NewtonsMethod::solveMinimization(ImplicitIntegratorInterface *integrator, V
 
 		if (stepSize < STEP_SIZE) {
 			std::cout << "Line search is making no progress: step size is " << stepSize << std::endl;
+			std::cout << "gradient = " << gradient.transpose() << std::endl;
 			return false;
 		}
 

@@ -2,6 +2,7 @@
 #include <Eigen/dense>
 #include "solver.h"
 #include "integrator.h"
+#include "minimizationExpression.h"
 
 
 Solver::Solver(const VectorX &initialPositions, const VectorX &initialVelocities, const SpMat &massMatrix, const std::vector<ConstraintInterface *> &constraints, double h):
@@ -20,9 +21,11 @@ void Solver::update() {
 
 		Eigen::Vector3d angularMomentum = Eigen::Vector3d::Zero();
 		computeAngularMomentum(mCurrentPositions, mCurrentVelocities, angularMomentum);
+		double hamiltonian = computeHamiltonian(mCurrentPositions, mCurrentVelocities);
 		std::cout << "mCurrentPositions = " << mCurrentPositions.transpose() << std::endl;
 		std::cout << "mCurrentVelocities = " << mCurrentVelocities.transpose() << std::endl;
 		std::cout << "angularMomentum = " << angularMomentum.transpose() << std::endl;
+		std::cout << "hamiltonian = " << hamiltonian << std::endl;
 	}
 	
 
@@ -41,6 +44,13 @@ void Solver::computeAngularMomentum(const VectorX &x, const VectorX &v, Eigen::V
 
 		angularMomentum += r.cross(p);
 	}
+}
+
+
+double Solver::computeHamiltonian(const VectorX &x, const VectorX &v) {
+
+	return NoDamping::Instance(this)->evaluateEnergy(x) + 0.5 * v.transpose() * mMassMatrix * v;
+
 }
 
 
